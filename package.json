@@ -1,0 +1,17 @@
+{
+  "author": "tknight0000",
+  "description": "A connect 5 like game that supports customizable boards and connection sizes. It also can generate game play databases for AI/ML training.",
+  "keywords": [],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "connect",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
