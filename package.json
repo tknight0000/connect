@@ -1,36 +1,33 @@
 {
   "author": "tknight0000",
   "description": "A connect 5 like game that supports customizable boards and connection sizes. It also can generate game play databases for AI/ML training.",
-  "keywords": [],
   "license": "MIT",
-  "main": "src/connect.ts",
   "name": "connect",
   "version": "0.1.0",
   "scripts": {
-    "build-dev": "npm run sass-dev && npm run tsc-dev && npm run html-dev",
-    "build": "rimraf dist && npm run sass && npm run tsc && npm run html && npm run tsc-minify && npm run html-minify && npm run inliner && rimraf dist/working",
+    "dev": "rimraf dist && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve\" \"npm run tsc-dev\" -n HTML,SCSS,HTTP,TS --pad-prefix",
     "html": "copyfiles -u 1 src/connect.html dist/working",
-    "html-dev": "copyfiles -u 1 src/connect.html dist",
+    "html-dev": "nodemon --quiet --watch src/connect.html -x \"copyfiles -u 1 src/connect.html dist\"",
     "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/working/connect.html --output dist/working/connect.html",
     "inliner": "inliner dist/working/connect.html > dist/connect.html",
+    "prod": "rimraf dist && npm run sass && npm run tsc && npm run html && npm run tsc-minify && npm run html-minify && npm run inliner && rimraf dist/working",
     "sass": "sass src/connect.scss:dist/working/connect.css --no-source-map --style compressed",
-    "sass-dev": "sass src/connect.scss:dist/connect.css",
-    "serve": "live-server dist --entry-file=connect.html --port 8080 --wait=500 --watch=connect.html",
+    "sass-dev": "sass src/connect.scss:dist/connect.css --quiet --watch",
+    "serve": "live-server dist --entry-file=connect.html --port 8080",
     "tsc": "tsc --project tsconfig.json",
-    "tsc-dev": "tsc --project tsconfig.dev.json",
-    "tsc-minify": "terser dist/working/connect.js --compress computed_props=false,passes=2 --mangle --mangle-props -o dist/working/connect.js",
-    "watch": "watch \"npm run build-dev\" src"
+    "tsc-dev": "tsc --preserveWatchOutput --project tsconfig.dev.json --watch",
+    "tsc-minify": "terser dist/working/connect.js --compress computed_props=false,passes=2 --mangle --mangle-props -o dist/working/connect.js"
   },
   "devDependencies": {
+    "concurrently": "^9.0.1",
     "copyfiles": "^2.0.0",
     "html-minifier-terser": "^7.0.0",
-    "http-server": "^14.0.0",
     "inliner": "^1.0.0",
     "live-server": "^1.2.2",
+    "nodemon": "^3.1.7",
     "rimraf": "^6.0.0",
     "sass": "^1.0.0",
     "terser": "^5.0.0",
-    "typescript": "^5.0.0",
-    "watch": "^1.0.0"
+    "typescript": "^5.0.0"
   }
 }
