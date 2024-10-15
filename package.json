@@ -3,15 +3,34 @@
   "description": "A connect 5 like game that supports customizable boards and connection sizes. It also can generate game play databases for AI/ML training.",
   "keywords": [],
   "license": "MIT",
-  "main": "index.js",
+  "main": "src/connect.ts",
   "name": "connect",
   "version": "0.1.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
+    "build-dev": "npm run sass-dev && npm run tsc-dev && npm run html-dev",
+    "build": "rimraf dist && npm run sass && npm run tsc && npm run html && npm run tsc-minify && npm run html-minify && npm run inliner && rimraf dist/working",
+    "html": "copyfiles -u 1 src/connect.html dist/working",
+    "html-dev": "copyfiles -u 1 src/connect.html dist",
+    "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/working/connect.html --output dist/working/connect.html",
+    "inliner": "inliner dist/working/connect.html > dist/connect.html",
+    "sass": "sass src/connect.scss:dist/working/connect.css --no-source-map --style compressed",
+    "sass-dev": "sass src/connect.scss:dist/connect.css",
+    "serve": "live-server dist --entry-file=connect.html --port 8080 --wait=500 --watch=connect.html",
+    "tsc": "tsc --project tsconfig.json",
+    "tsc-dev": "tsc --project tsconfig.dev.json",
+    "tsc-minify": "terser dist/working/connect.js --compress computed_props=false,passes=2 --mangle --mangle-props -o dist/working/connect.js",
+    "watch": "watch \"npm run build-dev\" src"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "copyfiles": "^2.0.0",
+    "html-minifier-terser": "^7.0.0",
+    "http-server": "^14.0.0",
+    "inliner": "^1.0.0",
+    "live-server": "^1.2.2",
+    "rimraf": "^6.0.0",
+    "sass": "^1.0.0",
+    "terser": "^5.0.0",
+    "typescript": "^5.0.0",
+    "watch": "^1.0.0"
   }
 }
