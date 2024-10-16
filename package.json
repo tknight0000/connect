@@ -5,29 +5,37 @@
   "name": "connect",
   "version": "0.1.0",
   "scripts": {
-    "dev": "rimraf dist && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve\" \"npm run tsc-dev\" -n HTML,SCSS,HTTP,TS --pad-prefix",
+    "dev": "rimraf dist && tsc && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve-dev\" \"npm run tsc-dev\" \"npm run webpack-dev\" -n HTML,SCSS,HTTP,TS --pad-prefix",
     "html": "copyfiles -u 1 src/connect.html dist/working",
     "html-dev": "nodemon --quiet --watch src/connect.html -x \"copyfiles -u 1 src/connect.html dist\"",
     "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/working/connect.html --output dist/working/connect.html",
-    "inliner": "inliner dist/working/connect.html > dist/connect.html",
-    "prod": "rimraf dist && npm run sass && npm run tsc && npm run html && npm run tsc-minify && npm run html-minify && npm run inliner && rimraf dist/working",
+    "inliner": "inliner dist/working/connect.html --nocompress --skip-absolute-urls > dist/connect.html",
+    "lint": "prettier src/. --write",
+    "prod": "rimraf dist && npm run lint && npm run sass && npm run tsc && npm run html && npm run html-minify && npm run webpack && npm run inliner && npm run worker && rimraf dist/working",
     "sass": "sass src/connect.scss:dist/working/connect.css --no-source-map --style compressed",
     "sass-dev": "sass src/connect.scss:dist/connect.css --quiet --watch",
     "serve": "live-server dist --entry-file=connect.html --port 8080",
+    "serve-dev": "live-server dist --entry-file=connect.html --port 8080 --quiet --watch=.",
     "tsc": "tsc --project tsconfig.json",
     "tsc-dev": "tsc --preserveWatchOutput --project tsconfig.dev.json --watch",
-    "tsc-minify": "terser dist/working/connect.js --compress computed_props=false,passes=2 --mangle --mangle-props -o dist/working/connect.js"
+    "webpack": "webpack --config webpack.config.js --mode production --output-path ./dist/working",
+    "webpack-dev": "webpack --config webpack.config.js --devtool source-map --mode development --output-path ./dist --watch",
+    "worker": "copyfiles -u 2 dist/working/*.connect.js dist"
   },
   "devDependencies": {
-    "concurrently": "^9.0.1",
+    "concurrently": "^9.0.0",
     "copyfiles": "^2.0.0",
+    "file-loader": "^6.2.0",
     "html-minifier-terser": "^7.0.0",
     "inliner": "^1.0.0",
-    "live-server": "^1.2.2",
-    "nodemon": "^3.1.7",
+    "live-server": "^1.0.0",
+    "nodemon": "^3.0.0",
+    "prettier": "^3.0.0",
     "rimraf": "^6.0.0",
     "sass": "^1.0.0",
     "terser": "^5.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.0.0"
   }
 }

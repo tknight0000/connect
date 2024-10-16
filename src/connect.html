@@ -1,16 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+  		<base href="/">
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link rel="stylesheet" href="./connect.css">
+		<link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Lato:400,700" type='text/css'>
+		<meta charset="utf-8">
+		<meta http-equiv="cache-control" content="public"> 
+  		<meta name="description" content="tknight0000's public github connect game that supports AI/ML multithreaded dataset generation">
+  		<meta name="robots" content="none">
+		<meta name="viewport" id="viewport-app" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>Connect</title>
+	</head>
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Connect</title>
-	<link rel="stylesheet" href="connect.css">
-</head>
-
-<body>
-	Hello World!!!
-	<script src="connect.js"></script>
-</body>
-
+	<body>
+		<div class="connect wrapper">
+			<div class="header">
+				<div class="wrapper">
+					<div class="logo">
+	        			<div class="image"></div>
+					</div>
+					<div id="connect-size" class="connect-size">
+						Connect 5
+					</div>
+					<div class="content">
+						<span class="hyperlink" id="reset-click" style="visibility: hidden;">Reset</span>
+						<span class="hyperlink" id="db-click-enable">DB</span>
+						<span class="hyperlink" id="info-click">Info</span>
+						<span class="hyperlink" id="settings-click-enable">Settings</span>
+					</div>
+				</div>
+			</div>
+			<div class="board" id="board">
+				<table class="gameboard" id="grid"></table>
+			</div>
+		</div>
+		<div class="modal-db modal" id="db">
+			<div class="background"></div>
+			<div class="foreground clickable" id="db-click-disable">
+				<div class="container" onclick="event.stopPropagation()">
+					<div class="header">
+						Gameplay DB Generator
+					</div>
+					<div class="body">
+						<form id="dbForm">
+							<table>
+								<tr>
+									<td>Amount</td>
+									<td>
+										<input min=1 max=1000 name="amount" type="number" value=250 />
+									</td>
+								</tr>
+								<tr>
+									<td>Board Height</td>
+									<td>
+										<input min=3 max=20 name="boardB" type="number" value=10 />
+									</td>
+								</tr>
+								<tr>
+									<td>Board Width</td>
+									<td>
+										<input min=3 max=20 name="boardA" type="number" value=10 />
+									</td>
+								</tr>
+								<tr>
+									<td>Connect Size</td>
+									<td>
+										<input min=3 max=10 name="connectSize" type="number" value=5 />
+									</td>
+								</tr>
+								<tr>
+									<td>Format</td>
+									<td class="radio-spread">
+										<span>
+											CSV
+											<input name="format" type="radio" checked />
+										</span>
+										<span>
+											JSON
+											<input name="format" type="radio" />
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td class="range-label-spread">
+										<span>Noob</span>
+										<span>-</span>
+										<span>Expert</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Skill</td>
+									<td>
+										<input id="dbFormSkill" min=1 max=10 name="skill" type="range" value=10 />
+									</td>
+								</tr>
+								<tr>
+									<td>Skill Random</td>
+									<td>
+										<input id="dbFormSkillRandom" name="skillRandom" type="checkbox" value=10 />
+									</td>
+								</tr>
+								<tr>
+									<td>Threads</td>
+									<td>
+										<input min=2 max=12 name="threads" type="number" value=4 />
+									</td>
+								</tr>
+								<tr></tr>
+								<tr>
+									<td class="center"><button id="dbFormCancel">Cancel</button></td>
+									<td class="center"><button id="dbFormApply">Apply</button></td>
+								</tr>
+							</table>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-settings modal" id="settings">
+			<div class="background"></div>
+			<div class="foreground clickable" id="settings-click-disable">
+				<div class="container" onclick="event.stopPropagation()">
+					<div class="header">
+						Settings
+					</div>
+					<div class="body">
+						<form id="settingsForm">
+							<table>
+								<tr>
+									<td>Board Height</td>
+									<td>
+										<input min=3 max=20 name="boardB" type="number" value=10 />
+									</td>
+								</tr>
+								<tr>
+									<td>Board Width</td>
+									<td>
+										<input min=3 max=20 name="boardA" type="number" value=10 />
+									</td>
+								</tr>
+								<tr>
+									<td>Connect Size</td>
+									<td>
+										<input min=3 max=10 name="connectSize" type="number" value=5 />
+									</td>
+								</tr>
+								<tr>
+									<td>Show Evaluations</td>
+									<td>
+										<input name="showEvaluations" type="checkbox" checked />
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td class="range-label-spread">
+										<span>Noob</span>
+										<span>-</span>
+										<span>Expert</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Skill</td>
+									<td>
+										<input min=1 max=10 name="skill" type="range" value=10 />
+									</td>
+								</tr>
+								<tr></tr>
+								<tr>
+									<td class="center"><button id="settingsFormCancel">Cancel</button></td>
+									<td class="center"><button id="settingsFormApply">Apply</button></td>
+								</tr>
+							</table>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-spinner" id="spinner">
+			<div class="rotate">X</div>
+		</div>
+		<div class="version" id="version"></div>
+		<script src="./connect.js" type="module"></script>
+	</body>
 </html>
