@@ -2,31 +2,52 @@ import { GameEngine } from './game/game.engine';
 
 self.onmessage = (event: MessageEvent) => {
 	let aMax: number = event.data.aMax,
-		amount: number = event.data.amount,
+		amount: number = 0,
+		amountEffective: number = event.data.amountEffective,
 		bMax: number = event.data.bMax,
 		connectSize: number = event.data.connectSize,
+		duationInMS: number = 30,
+		formatCSV: number = event.data.formatCSV,
 		gameEngine: GameEngine = new GameEngine(),
-		skill: number = event.data.skill,
-		skillRandom: boolean = event.data.skillRandom,
-		threadNumber: number = event.data.threadNumber;
-
-	console.log('DBGenThread-' + threadNumber, aMax, amount, bMax, connectSize, skill);
+		skill1: number = event.data.skill1,
+		skill1EngineAIML: boolean = event.data.skill1EngineAIML,
+		skill1Shuffle: boolean = event.data.skill1Shuffle,
+		skill2: number = event.data.skill2,
+		skill2EngineAIML: boolean = event.data.skill2EngineAIML,
+		skill2Shuffle: boolean = event.data.skill2Shuffle,
+		threadId: number = event.data.threadId;
 
 	// Set dumby callbacks (never called)
 	gameEngine.setCallbackGameOver(() => {
-		console.log('DBGenThread-' + threadNumber + ': game over, post results');
+		console.log('Thread-' + threadId + ': game over, post results');
+		amount++;
 		// self.postMessage({
 		// 	value: '42',
 		// });
 	});
-	gameEngine.setCallbackPlace(() => console.error('DBGenThread-' + threadNumber + ': callback place triggeered'));
+	gameEngine.setCallbackPlace(() => console.error('Thread-' + threadId + ': callback place triggeered'));
 
-	for (let i = 0; i < amount; i++) {
-		gameEngine.initialize(aMax, bMax, connectSize, false, skillRandom ? Math.floor(Math.random() * 10) + 1 : skill);
+	for (let i = 0; i < amountEffective; i++) {
+		// Use promises to pause here until the game over callback is used
+		gameEngine.initialize(
+			aMax,
+			bMax,
+			connectSize,
+			skill1Shuffle ? Math.floor(Math.random() * 10) + 1 : skill1,
+			skill1EngineAIML,
+			skill2Shuffle ? Math.floor(Math.random() * 10) + 1 : skill2,
+			skill2EngineAIML,
+		);
 
 		// TODO delete me
-		self.postMessage({
-			value: 'data-record-here',
-		});
+		setTimeout(() => {
+			self.postMessage({
+				amount: i + 1,
+				amountEffective: amountEffective,
+				data: formatCSV ? 'csv' : {},
+				duationInMS: duationInMS,
+				threadId: threadId,
+			});
+		}, 3000);
 	}
 };

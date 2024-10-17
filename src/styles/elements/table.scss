@@ -19,6 +19,10 @@ table {
 				text-align: center;
 			}
 
+			&.width-50 {
+				width: 50%;
+			}
+
 			&.radio-spread,
 			&.radio-spread > span {
 				align-items: center;

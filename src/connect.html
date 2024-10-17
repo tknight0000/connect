@@ -14,6 +14,7 @@
 	</head>
 
 	<body>
+		<a id="download" style="display:none;"></a>
 		<div class="connect wrapper">
 			<div class="header">
 				<div class="wrapper">
@@ -43,78 +44,152 @@
 						Gameplay DB Generator
 					</div>
 					<div class="body">
-						<form id="dbForm">
+						<div class="top">
+							<form id="dbForm">
+								<table>
+									<tr>
+										<td>Amount</td>
+										<td>
+											<input min=1 max=1000 name="amount" type="number" value=250 />
+										</td>
+									</tr>
+									<tr>
+										<td>Board Height</td>
+										<td>
+											<input min=3 max=20 name="boardB" type="number" value=10 />
+										</td>
+									</tr>
+									<tr>
+										<td>Board Width</td>
+										<td>
+											<input min=3 max=20 name="boardA" type="number" value=10 />
+										</td>
+									</tr>
+									<tr>
+										<td>Connect Size</td>
+										<td>
+											<input min=3 max=10 name="connectSize" type="number" value=5 />
+										</td>
+									</tr>
+									<tr>
+										<td>Format</td>
+										<td class="radio-spread">
+											<span>
+												CSV
+												<input name="format" type="radio" checked />
+											</span>
+											<span>
+												JSON
+												<input name="format" type="radio" />
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td class="range-label-spread">
+											<span>Noob</span>
+											<span>-</span>
+											<span>Expert</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Skill P1</td>
+										<td>
+											<input id="dbFormSkill1" min=1 max=10 name="skill" type="range" value=10 disabled />
+										</td>
+									</tr>
+									<tr>
+										<td>Skill P1 Engine</td>
+										<td class="radio-spread">
+											<span>
+												AI/ML
+												<input name="dbFormSkill1Engine" type="radio" disabled />
+											</span>
+											<span>
+												Linear
+												<input name="dbFormSkill1Engine" type="radio" checked disabled />
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Skill P1 Shuffle</td>
+										<td>
+											<input id="dbFormSkill1Shuffle" name="skillShuffle" type="checkbox" value=10 checked />
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td class="range-label-spread">
+											<span>Noob</span>
+											<span>-</span>
+											<span>Expert</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Skill P2</td>
+										<td>
+											<input id="dbFormSkill2" min=1 max=10 name="skill" type="range" value=10 disabled />
+										</td>
+									</tr>
+									<tr>
+										<td>Skill P2 Engine</td>
+										<td class="radio-spread">
+											<span>
+												AI/ML
+												<input name="dbFormSkill2Engine" type="radio" disabled />
+											</span>
+											<span>
+												Linear
+												<input name="dbFormSkill2Engine" type="radio" checked disabled />
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Skill P2 Shuffle</td>
+										<td>
+											<input id="dbFormSkill2Shuffle" name="skillShuffle" type="checkbox" value=10 checked />
+										</td>
+									</tr>
+									<tr>
+										<td>Threads</td>
+										<td>
+											<input min=2 max=12 name="threads" type="number" value=4 />
+										</td>
+									</tr>
+								</table>
+							</form>
+						</div>
+						<div class="bottom">
 							<table>
-								<tr>
-									<td>Amount</td>
-									<td>
-										<input min=1 max=1000 name="amount" type="number" value=250 />
-									</td>
-								</tr>
-								<tr>
-									<td>Board Height</td>
-									<td>
-										<input min=3 max=20 name="boardB" type="number" value=10 />
-									</td>
-								</tr>
-								<tr>
-									<td>Board Width</td>
-									<td>
-										<input min=3 max=20 name="boardA" type="number" value=10 />
-									</td>
-								</tr>
-								<tr>
-									<td>Connect Size</td>
-									<td>
-										<input min=3 max=10 name="connectSize" type="number" value=5 />
-									</td>
-								</tr>
-								<tr>
-									<td>Format</td>
-									<td class="radio-spread">
-										<span>
-											CSV
-											<input name="format" type="radio" checked />
-										</span>
-										<span>
-											JSON
-											<input name="format" type="radio" />
-										</span>
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td class="range-label-spread">
-										<span>Noob</span>
-										<span>-</span>
-										<span>Expert</span>
-									</td>
-								</tr>
-								<tr>
-									<td>Skill</td>
-									<td>
-										<input id="dbFormSkill" min=1 max=10 name="skill" type="range" value=10 />
-									</td>
-								</tr>
-								<tr>
-									<td>Skill Random</td>
-									<td>
-										<input id="dbFormSkillRandom" name="skillRandom" type="checkbox" value=10 />
-									</td>
-								</tr>
-								<tr>
-									<td>Threads</td>
-									<td>
-										<input min=2 max=12 name="threads" type="number" value=4 />
-									</td>
-								</tr>
-								<tr></tr>
 								<tr>
 									<td class="center"><button id="dbFormCancel">Cancel</button></td>
 									<td class="center"><button id="dbFormApply">Apply</button></td>
 								</tr>
 							</table>
-						</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-db-progress modal" id="dbProgress">
+			<div class="background"></div>
+			<div class="foreground">
+				<div class="container" onclick="event.stopPropagation()">
+					<div class="header">
+						Generation Progress
+					</div>
+					<div class="body">
+						<div class="top">
+							<div id="dbProgressContainer"></div>
+						</div>
+						<div class="bottom">
+							<table>
+								<tr>
+									<td class="center width-50"><button id="db-progress-click-cancel">Cancel</button></td>
+									<td class="center width-50"><button id="db-progress-click-download" disabled>Download</button></td>
+								</tr>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -127,53 +202,71 @@
 						Settings
 					</div>
 					<div class="body">
-						<form id="settingsForm">
+						<div class="top">
+							<form id="settingsForm">
+								<table>
+									<tr>
+										<td>Board Height</td>
+										<td>
+											<input min=3 max=20 name="boardB" type="number" value=10 />
+										</td>
+									</tr>
+									<tr>
+										<td>Board Width</td>
+										<td>
+											<input min=3 max=20 name="boardA" type="number" value=10 />
+										</td>
+									</tr>
+									<tr>
+										<td>Connect Size</td>
+										<td>
+											<input min=3 max=10 name="connectSize" type="number" value=5 />
+										</td>
+									</tr>
+									<tr>
+										<td>Show Evaluations</td>
+										<td>
+											<input name="showEvaluations" type="checkbox" checked />
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td class="range-label-spread">
+											<span>Noob</span>
+											<span>-</span>
+											<span>Expert</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Skill</td>
+										<td>
+											<input min=1 max=10 name="skill" type="range" value=10 />
+										</td>
+									</tr>
+									<tr>
+										<td>Skill Engine</td>
+										<td class="radio-spread">
+											<span>
+												AI/ML
+												<input name="dbFormSkillEngine" type="radio" disabled />
+											</span>
+											<span>
+												Linear
+												<input name="dbFormSkillEngine" type="radio" checked disabled />
+											</span>
+										</td>
+									</tr>
+								</table>
+							</form>
+						</div>
+						<div class="bottom">
 							<table>
-								<tr>
-									<td>Board Height</td>
-									<td>
-										<input min=3 max=20 name="boardB" type="number" value=10 />
-									</td>
-								</tr>
-								<tr>
-									<td>Board Width</td>
-									<td>
-										<input min=3 max=20 name="boardA" type="number" value=10 />
-									</td>
-								</tr>
-								<tr>
-									<td>Connect Size</td>
-									<td>
-										<input min=3 max=10 name="connectSize" type="number" value=5 />
-									</td>
-								</tr>
-								<tr>
-									<td>Show Evaluations</td>
-									<td>
-										<input name="showEvaluations" type="checkbox" checked />
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td class="range-label-spread">
-										<span>Noob</span>
-										<span>-</span>
-										<span>Expert</span>
-									</td>
-								</tr>
-								<tr>
-									<td>Skill</td>
-									<td>
-										<input min=1 max=10 name="skill" type="range" value=10 />
-									</td>
-								</tr>
-								<tr></tr>
 								<tr>
 									<td class="center"><button id="settingsFormCancel">Cancel</button></td>
 									<td class="center"><button id="settingsFormApply">Apply</button></td>
 								</tr>
 							</table>
-						</form>
+						</div>
 					</div>
 				</div>
 			</div>

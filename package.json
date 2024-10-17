@@ -5,7 +5,7 @@
   "name": "connect",
   "version": "0.1.0",
   "scripts": {
-    "dev": "rimraf dist && tsc && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve-dev\" \"npm run tsc-dev\" \"npm run webpack-dev\" -n HTML,SCSS,HTTP,TS --pad-prefix",
+    "dev": "rimraf dist && tsc && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve-dev\" \"npm run tsc-dev\" \"npm run webpack-dev\" -n HTML,SCSS,HTTP,TS,WEBP --pad-prefix",
     "html": "copyfiles -u 1 src/connect.html dist/working",
     "html-dev": "nodemon --quiet --watch src/connect.html -x \"copyfiles -u 1 src/connect.html dist\"",
     "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/working/connect.html --output dist/working/connect.html",

@@ -60,7 +60,8 @@ button {
 	padding: 0 20px;
 
 	&:disabled {
-		background-color: color-mix(in srgb, var(--global-color-accent-bright), black 5%);
+		background-color: color-mix(in srgb, var(--global-color-accent-bright), black 50%);
+		color: var(--global-color-gray-bb);
 		cursor: default;
 	}
 }

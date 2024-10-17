@@ -90,12 +90,203 @@ $connect-header-logo-width: 152px;
 }
 
 .modal-db {
-	display: none;
 	z-index: 2;
 
 	.foreground {
 		.container {
 			width: 50% !important;
+		}
+	}
+}
+
+.modal-db,
+.modal-db-progress,
+.modal-settings {
+	display: none;
+
+	.foreground {
+		.container {
+			.body {
+				height: 80vh;
+
+				.bottom {
+					background-color: rgba(0, 0, 0, 0.15);
+					border-radius: 5px;
+					border-top: 1px solid rgba(0, 0, 0, 0.5);
+					bottom: 0;
+					height: 80px;
+				}
+
+				.bottom,
+				.top {
+					left: 0;
+					position: absolute;
+					right: 0;
+				}
+
+				.top {
+					bottom: 80px;
+					overflow-x: hidden;
+					overflow-y: auto;
+					padding: 20px;
+					@include scrollbar();
+					top: 0;
+				}
+			}
+		}
+	}
+}
+
+.modal-db-progress {
+	z-index: 3;
+
+	.foreground {
+		.container {
+			.body {
+				.top {
+					.thread-progress-container {
+						border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
+						border-radius: 5px;
+						box-shadow: 2px 2px 2px 3px rgba(0, 0, 0, 0.25);
+						height: 100px;
+						position: relative;
+
+						&:not(:first-child) {
+							margin-top: 20px;
+						}
+
+						.container-left {
+							align-items: center;
+							background-color: rgba(0, 0, 0, 0.25);
+							border-bottom: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
+							border-radius: 5px;
+							border-right: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
+							bottom: -2px;
+							display: flex;
+							justify-content: center;
+							left: 0;
+							padding: 5px;
+							position: absolute;
+							width: 40px;
+						}
+
+						.container-left,
+						.container-right {
+							position: absolute;
+							top: 0;
+						}
+
+						.container-right {
+							background-color: rgba(0, 0, 0, 0.1);
+							bottom: 0;
+							box-shadow: inset 0 0 2px 3px rgba(0, 0, 0, 0.25);
+							left: 40px;
+							right: 0;
+
+							.progress-bar {
+								height: 50px;
+								position: relative;
+
+								.progress-container {
+									background-color: rgba(0, 0, 0, 0.25);
+									border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
+									border-radius: 5px;
+									bottom: 0;
+									left: 20px;
+									overflow: hidden;
+									position: absolute;
+									right: 20px;
+									top: 10px;
+
+									.progress {
+										border-radius: 5px;
+										height: 100%;
+										overflow: hidden;
+										position: relative;
+										transition: width 0.125s linear;
+										width: 0%;
+										min-width: 5px;
+										max-width: 100%;
+
+										.color {
+											animation: rotating-color 1.5s linear infinite;
+											bottom: 0;
+											z-index: 1;
+										}
+
+										&.complete {
+											.color {
+												animation: no;
+												background-color: rgba(0, 255, 255, 0.75);
+											}
+										}
+
+										.color,
+										.overlay {
+											left: 0;
+											position: absolute;
+											right: 0;
+											top: 0;
+										}
+
+										.overlay {
+											background-color: rgba(255, 255, 255, 0.15);
+											height: 5px;
+											z-index: 2;
+										}
+
+										@keyframes rotating-color {
+											0% {
+												background-color: rgba(0, 255, 0, 0.75);
+											}
+											50% {
+												background-color: rgba(0, 225, 0, 0.75);
+											}
+											100% {
+												background-color: rgba(0, 255, 0, 0.75);
+											}
+										}
+									}
+								}
+							}
+
+							.progress-bar,
+							.progress-text,
+							.timing {
+								position: relative;
+							}
+
+							.progress-text {
+								height: 20px;
+								text-align: center;
+							}
+
+							.timing {
+								height: 30px;
+
+								.left {
+									left: 0;
+								}
+
+								.left,
+								.right {
+									align-items: center;
+									bottom: 0;
+									display: flex;
+									justify-content: center;
+									position: absolute;
+									top: 0;
+									width: 50%;
+								}
+
+								.right {
+									right: 0;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -107,6 +298,10 @@ $connect-header-logo-width: 152px;
 	.foreground {
 		.container {
 			width: 50% !important;
+
+			.body {
+				height: 60vh;
+			}
 		}
 	}
 }

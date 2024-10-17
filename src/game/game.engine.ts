@@ -3,6 +3,7 @@ export class GameEngine {
 	private bMax: number = 0;
 	private callbackGameOver: ((xWon: boolean) => void) | undefined;
 	private callbackPlace: ((positionHash: number) => void) | undefined;
+	private connectSize: number = 5;
 	private human: boolean = false;
 
 	// TODO, every available position needs to be tracked by their value. This allows variable skills and selections.
@@ -11,18 +12,33 @@ export class GameEngine {
 	private mostValuable: { positionHash: number; value: number } = { positionHash: 0, value: 0 };
 
 	private placementsByPositionHash: { [key: number]: boolean } = {}; // true is O
-	private skill: number = 10;
+	private skill1: number = 10;
+	private skill1EngineAIML: boolean = false;
+	private skill2: number = 10;
+	private skill2EngineAIML: boolean = false;
 	private valuesByPositionHash: { [key: number]: { o: number; x: number } } = {};
 
-	public initialize(aMax: number, bMax: number, connectSize: number, human: boolean, skill: number): void {
+	public initialize(
+		aMax: number,
+		bMax: number,
+		connectSize: number,
+		skill1: number,
+		skill1EngineAIML: boolean,
+		skill2: number = -1,
+		skill2EngineAIML: boolean = false,
+	): void {
 		let t = this,
 			valuesByPositionHash: any = {};
 
 		t.aMax = aMax;
 		t.bMax = bMax;
-		t.human = human;
+		t.connectSize = connectSize;
+		t.human = skill2 !== -1;
 		t.placementsByPositionHash = <any>new Object();
-		t.skill = skill;
+		t.skill1 = skill1;
+		t.skill1EngineAIML = skill1EngineAIML;
+		t.skill2 = skill2;
+		t.skill2EngineAIML = skill2EngineAIML;
 
 		for (let a = 0; a < aMax; a++) {
 			for (let b = 0; b < bMax; b++) {
