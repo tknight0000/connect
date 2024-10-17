@@ -32,6 +32,8 @@ class Connect {
 	private showEvaluations: boolean = true;
 	private skill: number = 10;
 	private spinnerStatus: boolean;
+	private workers: Worker[];
+	private workersRunning: boolean;
 
 	constructor() {
 		let t = this;
@@ -247,33 +249,95 @@ class Connect {
 		threads: number,
 	): void {
 		let t = this,
+			amountEffective: number,
 			amountGenerated: number = 0,
+			data: any[] = [],
+			done: boolean = false,
+			doneCommitted: boolean = false,
 			generateWorker: any,
 			threadsLimit: number = Math.min(threads, amountRequested),
+			timeout: ReturnType<typeof setTimeout>,
+			timeStartInMS: number,
+			timeStopInMS: number,
 			worker: Worker,
 			workers: Worker[] = new Array(threadsLimit);
 
 		if (window.Worker) {
+			amountEffective = Math.ceil(amountRequested / threadsLimit); // Round up to make sure we get enough
+			t.workers = workers;
+			t.workersRunning = true;
+
 			// Spawn the workers (threads)
+			timeStartInMS = new Date().getTime();
 			for (let i = 0; i < threadsLimit; i++) {
 				worker = new Worker(new URL('./worker', import.meta.url));
 				workers[i] = worker; // Cache worker reference for cancelling early
 
+				if (i === threadsLimit - 1) {
+					/*
+					 * Last thread:
+					 *
+					 * This ensures that we only generate the exact amount of games requested. As the rounding
+					 * errors high. This runs fewer on the last thread to offset the rounding error.
+					 */
+					amountEffective -= amountEffective * threadsLimit - amountRequested;
+				}
+
 				worker.postMessage({
 					aMax: aMax,
-					amount: Math.round(amountRequested / threadsLimit), // each thread should generate their portion of the load
+					amount: amountEffective, // each thread should generate their portion of the load
 					bMax: bMax,
 					connectSize: connectSize,
-					skill: skillRandom ? Math.floor(Math.random() * 10) + 1 : skill,
+					skill: skill,
+					skillRandom: skillRandom,
+					threadNumber: i,
 				});
-				worker.onmessage = ({ data: { answer } }) => {
+				worker.onmessage = (event: MessageEvent) => {
 					amountGenerated++;
-					console.log('we are ' + amountGenerated + '/' + amountRequested, answer);
+					data.push(0);
+
+					console.log('complete:', event.data.value);
+
+					if (!done && amountGenerated >= amountRequested) {
+						done = true;
+						clearTimeout(timeout);
+						timeout = setTimeout(() => {
+							if (!doneCommitted) {
+								doneCommitted = true;
+								timeStopInMS = new Date().getTime() - 1000;
+								t.workersRunning = false;
+								t.dbApplyWebWorkersDone(data, formatCSV, timeStopInMS - timeStartInMS);
+							}
+						}, 1000);
+					}
 				};
 			}
 		} else {
 			alert('Web Workers are not supported by your browser');
 		}
+	}
+
+	private dbApplyWebWorkersCancel() {
+		let t = this,
+			workers: Worker[] = t.workers;
+
+		if (t.workersRunning) {
+			// Update UI for Cancelling
+
+			// Cancel Work
+			t.workersRunning = false;
+			for (let i = 0; i < workers.length; i++) {
+				workers[i].onmessage = () => {}; // Block results response
+				workers[i].terminate();
+			}
+			t.workers = new Array();
+
+			// Update UI for Cancelled
+		}
+	}
+
+	private dbApplyWebWorkersDone(data: any[], formatCSV: boolean, runDurationInMS: number) {
+		console.log('dbApplyWebWorkersDone:', data.length, 'records; it took', runDurationInMS + 'ms; format csv =', formatCSV);
 	}
 
 	private dbDisplay(active: boolean): void {
