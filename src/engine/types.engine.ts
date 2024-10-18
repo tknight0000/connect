@@ -8,6 +8,12 @@ export type Dimensions = {
 	connectSize: number;
 };
 
+export type MasterTraversalSetAndChains = {
+	traversalSetAndChainsGroup: TraversalSetAndChains[];
+	winning: boolean;
+	winningPositionHashes: number[] | undefined;
+};
+
 export type TraversalChain = {
 	o: boolean;
 	placement: TraversalChainPlacement;

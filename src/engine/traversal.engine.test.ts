@@ -5,7 +5,7 @@
 const util = require('util');
 import { log } from 'console';
 import { TraversalEngine } from './traversal.engine';
-import { Dimensions, TraversalSetAndChains, TraversalType, WorkingData } from './types.engine';
+import { Dimensions, MasterTraversalSetAndChains, TraversalSetAndChains, TraversalType, WorkingData } from './types.engine';
 
 let dimensions: Dimensions = {
 		aMax: 9,
@@ -1050,7 +1050,7 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[4].placement.index).toBe(dimensions.aMax - 1);
 	});
 
-	test('Type3-D Winning Chain', () => {
+	test('Type4-U Winning Chain', () => {
 		let placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			positionStartA: number,
 			positionStartB: number,
@@ -1112,5 +1112,214 @@ describe('GameEngine: Traversal', () => {
 
 		// Reset global values
 		dimensions.connectSize = previous;
+	});
+
+	test('MasterSet', () => {
+		let aMaxEff: number = dimensions.aMax + 1,
+			bMaxEff: number = dimensions.bMax + 1,
+			connectSize: number = dimensions.connectSize,
+			positionHash: number,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			placementsType1H: { [key: number]: boolean } = {},
+			placementsType2V: { [key: number]: boolean } = {},
+			placementsType3D: { [key: number]: boolean } = {},
+			placementsType4U: { [key: number]: boolean } = {},
+			traversalSetAndChainsGroup: TraversalSetAndChains[],
+			masterTraversalSetAndChains: MasterTraversalSetAndChains;
+
+		// Prepare placements
+		for (let A = 0; A < aMaxEff; A++) {
+			placementsType2V[hashTo(A, 0)] = false; // [A0, B0-B9]
+			placementsByPositionHash[hashTo(A, 0)] = false; // Together covers all shared trigger points
+
+			if (A < aMaxEff - connectSize + 2) {
+				placementsByPositionHash[hashTo(A, dimensions.bMax)] = false; // Together covers all shared trigger points
+			}
+		}
+		for (let B = 0; B < bMaxEff; B++) {
+			placementsType1H[hashTo(0, B)] = false; // [A0-A9, B0]
+			placementsByPositionHash[hashTo(0, B)] = false; // Together covers all shared trigger points
+		}
+		for (let A = 0; A < aMaxEff - (connectSize - 2); A++) {
+			placementsType3D[hashTo(A, 0)] = false; // [A0-A6, 0]
+			placementsType4U[hashTo(A, dimensions.bMax)] = false; // [A0-A6, B9]
+		}
+		for (let B = 1; B < bMaxEff - 1; B++) {
+			if (B < bMaxEff - (connectSize - 2)) {
+				placementsType3D[hashTo(0, B)] = false; // [A0, B1-B6]
+			}
+			if (B > connectSize - 3) {
+				placementsType4U[hashTo(0, B)] = false; // [A0, B3-B8]
+			}
+		}
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', Object.keys(placementsByPositionHash).map((v) => Number(v).toString(16).padStart(4, '0')));
+
+		// Generate chains
+		masterTraversalSetAndChains = TraversalEngine.masterSet(dimensions, workingData);
+		// log('masterTraversalSetAndChains', util.inspect(masterTraversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		traversalSetAndChainsGroup = masterTraversalSetAndChains.traversalSetAndChainsGroup;
+		for (let i = 0; i < traversalSetAndChainsGroup.length; i++) {
+			if (traversalSetAndChainsGroup[i].chains.length) {
+				positionHash = traversalSetAndChainsGroup[i].chains[0].placement.cells[0]; // Should be the first chain's first cell found also in trigger group
+
+				// Filter out overlapping cells (EG [(A0, B0), (A1, B0)] are part of the trigger group but (A1, B0) would fail H1 as a 2nd trigger)
+				switch (traversalSetAndChainsGroup[i].type) {
+					case TraversalType.TYPE1_H:
+						if (placementsType1H[positionHash] === undefined) {
+							log(
+								'placementsType1H',
+								Object.keys(placementsType1H).map((v) => Number(v).toString(16).padStart(4, '0')),
+							);
+							throw new Error('placementsType1H[' + Number(positionHash).toString(16).padStart(4, '0') + ']: unexpected position hash');
+						}
+						placementsType1H[positionHash] = true;
+						break;
+					case TraversalType.TYPE2_V:
+						if (placementsType2V[positionHash] === undefined) {
+							log(
+								'placementsType2V',
+								Object.keys(placementsType2V).map((v) => Number(v).toString(16).padStart(4, '0')),
+							);
+							throw new Error('placementsType2V[' + Number(positionHash).toString(16).padStart(4, '0') + ']: unexpected position hash');
+						}
+						placementsType2V[positionHash] = true;
+						break;
+					case TraversalType.TYPE3_D:
+						if (placementsType3D[positionHash] === undefined) {
+							log(
+								'placementsType3D',
+								Object.keys(placementsType3D).map((v) => Number(v).toString(16).padStart(4, '0')),
+							);
+							throw new Error('placementsType3D[' + Number(positionHash).toString(16).padStart(4, '0') + ']: unexpected position hash');
+						}
+						placementsType3D[positionHash] = true;
+						break;
+					case TraversalType.TYPE4_U:
+						if (placementsType4U[positionHash] === undefined) {
+							log(
+								'placementsType4U',
+								Object.keys(placementsType4U).map((v) => Number(v).toString(16).padStart(4, '0')),
+							);
+							throw new Error('placementsType4U[' + Number(positionHash).toString(16).padStart(4, '0') + ']: unexpected position hash');
+						}
+						placementsType4U[positionHash] = true;
+						break;
+				}
+			}
+		}
+
+		for (let i in placementsType1H) {
+			if (!placementsType1H[i]) {
+				log(
+					'placementsType1H',
+					Object.keys(placementsType1H).map((v) => Number(v).toString(16).padStart(4, '0')),
+				);
+				throw new Error('placementsType1H[' + Number(i).toString(16).padStart(4, '0') + ']: missing position hash');
+			}
+		}
+		for (let i in placementsType2V) {
+			if (!placementsType2V[i]) {
+				log(
+					'placementsType2V',
+					Object.keys(placementsType2V).map((v) => Number(v).toString(16).padStart(4, '0')),
+				);
+				throw new Error('placementsType2V[' + Number(i).toString(16).padStart(4, '0') + ']: missing position hash');
+			}
+		}
+		for (let i in placementsType3D) {
+			if (!placementsType3D[i]) {
+				log(
+					'placementsType3D',
+					Object.keys(placementsType3D).map((v) => Number(v).toString(16).padStart(4, '0')),
+				);
+				throw new Error('placementsType3D[' + Number(i).toString(16).padStart(4, '0') + ']: missing position hash');
+			}
+		}
+		for (let i in placementsType4U) {
+			if (!placementsType4U[i]) {
+				log(
+					'placementsType4U',
+					Object.keys(placementsType4U).map((v) => Number(v).toString(16).padStart(4, '0')),
+				);
+				throw new Error('placementsType4U[' + Number(i).toString(16).padStart(4, '0') + ']: missing position hash');
+			}
+		}
+	});
+
+	test('MasterSet Winning Chain', () => {
+		let placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			masterTraversalSetAndChains: MasterTraversalSetAndChains,
+			winningPositionHashes: number[];
+
+		// Prepare placements
+		for (let A = 0; A < dimensions.connectSize; A++) {
+			placementsByPositionHash[hashTo(A, 0)] = false;
+		}
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', Object.keys(placementsByPositionHash).map((v) => Number(v).toString(16).padStart(4, '0')));
+
+		// Generate chains
+		masterTraversalSetAndChains = TraversalEngine.masterSet(dimensions, workingData);
+		// log('masterTraversalSetAndChains', util.inspect(masterTraversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(masterTraversalSetAndChains.winning).toBe(true);
+		expect(Array.isArray(masterTraversalSetAndChains.winningPositionHashes)).toBe(true);
+		expect((<number[]>masterTraversalSetAndChains.winningPositionHashes).length).toBe(Object.keys(placementsByPositionHash).length);
+
+		winningPositionHashes = <number[]>masterTraversalSetAndChains.winningPositionHashes;
+		// log('winningPositionHashes', winningPositionHashes.map((v) => Number(v).toString(16).padStart(4, '0')));
+		for (let i = 0; i < winningPositionHashes.length; i++) {
+			if (placementsByPositionHash[winningPositionHashes[i]] === undefined) {
+				throw new Error('winningPositionHashes[' + Number(winningPositionHashes[i]).toString(16).padStart(4, '0') + ']: unexpected');
+			}
+		}
+	});
+
+	test('MasterSet Winning Multi Chain', () => {
+		let aMax: number = 8,
+			bMax: number = 8,
+			aPrevious: number = dimensions.aMax,
+			bPrevious: number = dimensions.bMax,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			masterTraversalSetAndChains: MasterTraversalSetAndChains,
+			winningPositionHashes: number[];
+
+		// Change globals
+		dimensions.aMax = aMax;
+		dimensions.bMax = bMax;
+
+		// Prepare placements
+		for (let A = 0, B = 0; A <= aMax && B <= bMax; A++, B++) {
+			placementsByPositionHash[hashTo(A, 4)] = false; // Type1H
+			placementsByPositionHash[hashTo(4, B)] = false; // Type2V
+			placementsByPositionHash[hashTo(A, B)] = false; // Type3D
+			placementsByPositionHash[hashTo(A, bMax - B)] = false; // Type4U
+		}
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', Object.keys(placementsByPositionHash).map((v) => Number(v).toString(16).padStart(4, '0')).sort());
+
+		// Generate chains
+		masterTraversalSetAndChains = TraversalEngine.masterSet(dimensions, workingData);
+		// log('masterTraversalSetAndChains', util.inspect(masterTraversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(masterTraversalSetAndChains.winning).toBe(true);
+		expect(Array.isArray(masterTraversalSetAndChains.winningPositionHashes)).toBe(true);
+		expect((<number[]>masterTraversalSetAndChains.winningPositionHashes).length).toBe(Object.keys(placementsByPositionHash).length);
+
+		winningPositionHashes = <number[]>masterTraversalSetAndChains.winningPositionHashes;
+		// log('winningPositionHashes', winningPositionHashes.map((v) => Number(v).toString(16).padStart(4, '0')));
+		for (let i = 0; i < winningPositionHashes.length; i++) {
+			if (placementsByPositionHash[winningPositionHashes[i]] === undefined) {
+				throw new Error('winningPositionHashes[' + Number(winningPositionHashes[i]).toString(16).padStart(4, '0') + ']: unexpected');
+			}
+		}
+
+		// Restore globals
+		dimensions.aMax = aPrevious;
+		dimensions.bMax = bPrevious;
 	});
 });

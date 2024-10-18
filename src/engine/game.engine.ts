@@ -5,7 +5,7 @@
 import { SkillLinearEngine } from './skill-linear.engine';
 import { TraversalEngine } from './traversal.engine';
 export { WorkingDataValues } from './types.engine'; // Make available under this primary module
-import { Dimensions, WorkingData, WorkingDataValues } from './types.engine';
+import { Dimensions, MasterTraversalSetAndChains, WorkingData, WorkingDataValues } from './types.engine';
 
 export class GameEngine {
 	private callbackGameOver: ((xWon: boolean) => void) | undefined;
@@ -25,13 +25,17 @@ export class GameEngine {
 	 * @return positionHash
 	 */
 	private calc(): number {
-		let t = this;
+		let t = this,
+			masterSet: MasterTraversalSetAndChains;
+
+		masterSet = TraversalEngine.masterSet(t.dimensions, t.workingData);
+		console.log('masterSet', masterSet);
 
 		// gather master chain set
 		// is game over?
 		// evaluate positions
-		// call skill system to make placement determination
-		// return placement
+		// call skill system to make placement determination /// don't do this here
+		// return placement /// don't do this here
 
 		// TODO: remove below, random for now to give the ui something to work with
 		let x: number, o: number;
