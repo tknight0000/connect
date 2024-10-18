@@ -4,6 +4,8 @@
  * @author tknight-dev
  */
 
+import { Dimensions, WorkingData } from './types.engine';
+
 export class SkillLinearEngine {
 	// // _5 is expert (perfect)
 	// private static _4: number[] = [0, 5, 20, 75];
@@ -14,25 +16,7 @@ export class SkillLinearEngine {
 	/**
 	 * @return is positionHash
 	 */
-	public static calc(
-		skill: number,
-		workingData: {
-			placementsAvailableByPositionHash: { [key: number]: null };
-			placementsByPositionHash: { [key: number]: boolean }; // true is O
-			positionHashesByValues: { [key: number]: number[] };
-			values: {
-				valuesByPositionHash: { [key: number]: { o: number; x: number } };
-				valuesO: {
-					max: number;
-					min: number;
-				};
-				valuesX: {
-					max: number;
-					min: number;
-				};
-			};
-		},
-	): number {
+	public static calc(skill: number, workingData: WorkingData): number {
 		if (skill === 5) {
 			return 0;
 		} else if (skill > 1) {
@@ -47,28 +31,10 @@ export class SkillLinearEngine {
 	/**
 	 * @return is positionHash
 	 */
-	public static placeFirst(
-		aMax: number,
-		bMax: number,
-		skill: number,
-		workingData: {
-			placementsAvailableByPositionHash: { [key: number]: null };
-			placementsByPositionHash: { [key: number]: boolean }; // true is O
-			positionHashesByValues: { [key: number]: number[] };
-			values: {
-				valuesByPositionHash: { [key: number]: { o: number; x: number } };
-				valuesO: {
-					max: number;
-					min: number;
-				};
-				valuesX: {
-					max: number;
-					min: number;
-				};
-			};
-		},
-	): number {
-		let t = this;
+	public static placeFirst(dimensions: Dimensions, skill: number, workingData: WorkingData): number {
+		let t = this,
+			aMax = dimensions.aMax,
+			bMax = dimensions.bMax;
 
 		if (skill !== 1) {
 			let a: number,

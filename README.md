@@ -6,6 +6,7 @@ Output files from the build processes are stored in the `dist` directory
 
 ## Dev
 -	`npm run dev` to watch for code changes and live-reload browser if changed
+-	`npm run test-dev` to watch for code changes and re-run unit tests if changed
 
 ## Prod
 -	`npm run prod` to generate the compressed `connect.html`

@@ -3,37 +3,23 @@
  */
 
 import { SkillLinearEngine } from './skill-linear.engine';
+import { TraversalEngine } from './traversal.engine';
+export { WorkingDataValues } from './types.engine'; // Make available under this primary module
+import { Dimensions, WorkingData, WorkingDataValues } from './types.engine';
 
 export class GameEngine {
-	private aMax: number = 0;
-	private bMax: number = 0;
 	private callbackGameOver: ((xWon: boolean) => void) | undefined;
 	private callbackPlace: ((positionHash: number) => void) | undefined;
-	private connectSize: number = 5;
+	private dimensions: Dimensions;
 	private gameOver: boolean = false;
 	private human: boolean = false; // human implies X piece
 	private humanWon: boolean = false; // human implies X piece
-	private humanPlacementExpected: boolean = false;
+	private initialized: boolean = false;
 	private skill1: number = 5;
 	private skill1EngineAIML: boolean = false;
 	private skill2: number = 5;
 	private skill2EngineAIML: boolean = false;
-	private workingData: {
-		placementsAvailableByPositionHash: { [key: number]: null };
-		placementsByPositionHash: { [key: number]: boolean }; // true is O
-		positionHashesByValues: { [key: number]: number[] };
-		values: {
-			valuesByPositionHash: { [key: number]: { o: number; x: number } };
-			valuesO: {
-				max: number;
-				min: number;
-			};
-			valuesX: {
-				max: number;
-				min: number;
-			};
-		};
-	};
+	private workingData: WorkingData;
 
 	/**
 	 * @return positionHash
@@ -75,16 +61,20 @@ export class GameEngine {
 		skill2: number = -1,
 		skill2EngineAIML: boolean = false,
 	): void {
-		let t = this;
+		let t = this,
+			dimensions: Dimensions = {
+				aMax: aMax,
+				bMax: bMax,
+				connectSize: connectSize,
+			};
 
-		t.aMax = aMax;
-		t.bMax = bMax;
-		t.connectSize = connectSize;
+		t.dimensions = dimensions;
 		t.human = skill2 === -1;
 		t.skill1 = skill1;
 		t.skill1EngineAIML = skill1EngineAIML;
 		t.skill2 = skill2;
 		t.skill2EngineAIML = skill2EngineAIML;
+		t.initialized = true;
 
 		t.reset();
 
@@ -99,17 +89,24 @@ export class GameEngine {
 
 	public reset(): void {
 		let t = this,
+			aMax: number = t.dimensions.aMax,
+			bMax: number = t.dimensions.bMax,
 			positionHash: number,
 			placementsAvailableByPositionHash: { [key: number]: null } = [],
 			positionHashesByValues: { [key: number]: number[] } = {},
 			valuesByPositionHash: { [key: number]: { o: number; x: number } } = {};
 
+		if (!t.initialized) {
+			console.error('GameEngine > reset: engine not initialized yet');
+			return;
+		}
+
 		positionHashesByValues = <any>new Object();
 		positionHashesByValues[0] = [];
 
 		// Initialize map values to 0
-		for (let a = 0; a < t.aMax; a++) {
-			for (let b = 0; b < t.bMax; b++) {
+		for (let a = 0; a < aMax; a++) {
+			for (let b = 0; b < bMax; b++) {
 				positionHash = ((a & 0xff) << 8) | (b & 0xff);
 
 				placementsAvailableByPositionHash[positionHash] = null;
@@ -138,8 +135,7 @@ export class GameEngine {
 
 		if (!t.human) {
 			// computer place first
-			positionHash = SkillLinearEngine.placeFirst(t.aMax, t.bMax, t.skill1, t.workingData);
-			t.humanPlacementExpected = false;
+			positionHash = SkillLinearEngine.placeFirst(t.dimensions, t.skill1, t.workingData);
 
 			// TODO
 			// while(!t.gameOver) {
@@ -160,7 +156,10 @@ export class GameEngine {
 	public place(positionHash: number): boolean {
 		let t = this;
 
-		if (!t.human) {
+		if (!t.initialized) {
+			console.error('GameEngine > place: engine not initialized yet');
+			return false;
+		} else if (!t.human) {
 			console.error('GameEngine > place: human placements not configured');
 			return false;
 		} else if (t.workingData.placementsByPositionHash[positionHash]) {
@@ -192,17 +191,11 @@ export class GameEngine {
 		return round ? Math.round(value) : value;
 	}
 
-	public getValues(): {
-		valuesByPositionHash: { [key: number]: { o: number; x: number } };
-		valuesO: {
-			max: number;
-			min: number;
-		};
-		valuesX: {
-			max: number;
-			min: number;
-		};
-	} {
+	public getValues(): WorkingDataValues | null {
+		if (!this.initialized) {
+			console.error('GameEngine > getValues: engine not initialized yet');
+			return null;
+		}
 		return this.workingData.values;
 	}
 

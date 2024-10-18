@@ -2,7 +2,7 @@
  * @author tknight-dev
  */
 
-import { GameEngine } from './game/game.engine';
+import { GameEngine, WorkingDataValues } from './engine/game.engine';
 var globalPackageJSONVersion = require('../../package.json').version;
 
 // App
@@ -273,17 +273,7 @@ class Connect {
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash,
 			elementTD: HTMLElement = t.elementBoardGridCellsByPositionHash[positionHash],
 			elementTDPiece: HTMLElement,
-			values: {
-				valuesByPositionHash: { [key: number]: { o: number; x: number } };
-				valuesO: {
-					max: number;
-					min: number;
-				};
-				valuesX: {
-					max: number;
-					min: number;
-				};
-			};
+			values: WorkingDataValues | null;
 
 		// Remove clickable
 		elementTD.className = '';
@@ -296,24 +286,29 @@ class Connect {
 
 		if (t.showEvaluations) {
 			values = t.gameEngine.getValues();
-			let elements: { o: HTMLElement; x: HTMLElement },
-				opacityMax: number = 50,
-				opacityMin: number = 0,
-				opacityO: number,
-				opacityX: number,
-				valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash,
-				valuesOMax: number = values.valuesO.max,
-				valuesOMin: number = values.valuesO.min,
-				valuesXMax: number = values.valuesX.max,
-				valuesXMin: number = values.valuesX.min;
 
-			for (let [positionHash, evaluation] of Object.entries(valuesByPositionHash)) {
-				opacityO = GameEngine.scale(evaluation.o, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
-				opacityX = GameEngine.scale(evaluation.x, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
+			if (values) {
+				let elements: { o: HTMLElement; x: HTMLElement },
+					opacityMax: number = 50,
+					opacityMin: number = 0,
+					opacityO: number,
+					opacityX: number,
+					valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash,
+					valuesOMax: number = values.valuesO.max,
+					valuesOMin: number = values.valuesO.min,
+					valuesXMax: number = values.valuesX.max,
+					valuesXMin: number = values.valuesX.min;
 
-				elements = elementBoardGridCellsColorByPositionHash[Number(positionHash)];
-				elements.o.style.opacity = String(opacityO / 100);
-				elements.x.style.opacity = String(opacityX / 100);
+				for (let [positionHash, evaluation] of Object.entries(valuesByPositionHash)) {
+					opacityO = GameEngine.scale(evaluation.o, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
+					opacityX = GameEngine.scale(evaluation.x, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
+
+					elements = elementBoardGridCellsColorByPositionHash[Number(positionHash)];
+					elements.o.style.opacity = String(opacityO / 100);
+					elements.x.style.opacity = String(opacityX / 100);
+				}
+			} else {
+				console.warn('Connect > boardGridPlaced: engines values were null');
 			}
 		}
 

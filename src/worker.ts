@@ -2,7 +2,7 @@
  * @author tknight-dev
  */
 
-import { GameEngine } from './game/game.engine';
+import { GameEngine } from './engine/game.engine';
 
 self.onmessage = (event: MessageEvent) => {
 	let aMax: number = event.data.aMax,
