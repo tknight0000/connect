@@ -10,7 +10,7 @@ class Connect {
 	private elementBoard: HTMLElement;
 	private elementBoardGrid: HTMLElement;
 	private elementBoardGridCellsByPositionHash: { [key: number]: HTMLElement } = {};
-	private elementBoardGridCellsColorByPositionHash: { [key: number]: HTMLElement } = {};
+	private elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = {};
 	private elementConnectSize: HTMLElement;
 	private elementDownload: HTMLElement;
 	private elementMenuDB: HTMLElement;
@@ -164,7 +164,8 @@ class Connect {
 			boardGridClick: any = t.boardGridClick,
 			elementBoardGrid: HTMLElement | null = t.elementBoardGrid,
 			elementTD: HTMLElement,
-			elementTDColor: HTMLElement,
+			elementTDColorO: HTMLElement,
+			elementTDColorX: HTMLElement,
 			elementTDCoordinate: HTMLElement,
 			elementTDOnClickFunction: HTMLElement,
 			elementTR: HTMLElement,
@@ -201,7 +202,8 @@ class Connect {
 
 				// Create elements
 				elementTD = document.createElement('td');
-				elementTDColor = document.createElement('div');
+				elementTDColorO = document.createElement('div');
+				elementTDColorX = document.createElement('div');
 				elementTDCoordinate = document.createElement('div');
 
 				// Style cell
@@ -210,20 +212,25 @@ class Connect {
 				elementTD.onclick = () => t.boardGridClick(positionHash);
 
 				// Style cell color
-				elementTDColor.className = 'color';
+				elementTDColorO.className = 'color o';
+				elementTDColorX.className = 'color x';
 
 				// Style cell coordinate
 				elementTDCoordinate.className = 'coordinate';
 				elementTDCoordinate.innerText = a + ',' + b;
 
 				// Append elements
-				elementTD.appendChild(elementTDColor);
+				elementTD.appendChild(elementTDColorO);
+				elementTD.appendChild(elementTDColorX);
 				elementTD.appendChild(elementTDCoordinate);
 				elementTR.appendChild(elementTD);
 
 				// Register element with position hash
 				t.elementBoardGridCellsByPositionHash[positionHash] = elementTD;
-				t.elementBoardGridCellsColorByPositionHash[positionHash] = elementTDColor;
+				t.elementBoardGridCellsColorByPositionHash[positionHash] = {
+					o: elementTDColorO,
+					x: elementTDColorX,
+				};
 			}
 
 			// Append row
@@ -263,13 +270,9 @@ class Connect {
 	 */
 	private boardGridPlaced(positionHash: number): void {
 		let t = this,
-			colorMax: number = 255,
-			colorMin: number = 0,
-			elementBoardGridCellsColorByPositionHash: { [key: number]: HTMLElement } = t.elementBoardGridCellsColorByPositionHash,
+			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash,
 			elementTD: HTMLElement = t.elementBoardGridCellsByPositionHash[positionHash],
 			elementTDPiece: HTMLElement,
-			opacityMax: number = 75,
-			opacityMin: number = 0,
 			values: {
 				valuesByPositionHash: { [key: number]: { o: number; x: number } };
 				valuesO: {
@@ -293,21 +296,24 @@ class Connect {
 
 		if (t.showEvaluations) {
 			values = t.gameEngine.getValues();
-			let valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash,
-				valueEffO: number,
-				valueEffX: number,
-				valueEffT: number,
+			let elements: { o: HTMLElement; x: HTMLElement },
+				opacityMax: number = 50,
+				opacityMin: number = 0,
+				opacityO: number,
+				opacityX: number,
+				valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash,
 				valuesOMax: number = values.valuesO.max,
 				valuesOMin: number = values.valuesO.min,
 				valuesXMax: number = values.valuesX.max,
 				valuesXMin: number = values.valuesX.min;
 
 			for (let [positionHash, evaluation] of Object.entries(valuesByPositionHash)) {
-				valueEffO = GameEngine.scale(evaluation.o, valuesOMax, valuesOMin, colorMax, colorMin, true);
-				valueEffX = GameEngine.scale(evaluation.x, valuesOMax, valuesOMin, colorMax, colorMin, true);
-				valueEffT = GameEngine.scale(valueEffO + valueEffX, colorMax * 2, colorMin, opacityMax, opacityMin, true);
+				opacityO = GameEngine.scale(evaluation.o, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
+				opacityX = GameEngine.scale(evaluation.x, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
 
-				elementBoardGridCellsColorByPositionHash[Number(positionHash)].style.backgroundColor = `rgba(${valueEffO}, ${valueEffX},0,${valueEffT / 100})`;
+				elements = elementBoardGridCellsColorByPositionHash[Number(positionHash)];
+				elements.o.style.opacity = String(opacityO / 100);
+				elements.x.style.opacity = String(opacityX / 100);
 			}
 		}
 

@@ -59,12 +59,25 @@ table {
 					background-color: $table-cell-background-color-alt;
 				}
 
-				.coordinate {
-					bottom: 1px;
-					color: var(--global-color-gray-bb);
-					font-size: 10px;
-					right: 1px;
-					z-index: 2;
+				.color {
+					bottom: 5px;
+					left: 5px;
+					opacity: 0;
+					right: 5px;
+					top: 5px;
+					transition: opacity 0.5s;
+
+					&.o {
+						background-color: rgb(176, 42, 67);
+						box-shadow: 0 0 3px 3px rgb(176, 42, 67);
+						z-index: 1;
+					}
+
+					&.x {
+						background-color: rgb(67, 176, 42);
+						box-shadow: 0 0 3px 3px rgb(67, 176, 42);
+						z-index: 2;
+					}
 				}
 
 				.color,
@@ -73,17 +86,20 @@ table {
 					position: absolute;
 				}
 
-				.color,
+				.coordinate {
+					bottom: 1px;
+					color: var(--global-color-gray-bb);
+					font-size: 10px;
+					right: 1px;
+					z-index: 3;
+				}
+
 				.piece {
 					bottom: 0;
 					left: 0;
 					right: 0;
 					top: 0;
-					z-index: 1;
-				}
-
-				.piece {
-					z-index: 3;
+					z-index: 4;
 
 					&.o {
 						// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
