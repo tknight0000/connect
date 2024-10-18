@@ -1,3 +1,7 @@
+/**
+ * @author tknight-dev
+ */
+
 @mixin scrollbar {
 	scrollbar-color: var(--global-color-app-background-accent) var(--global-color-app-background);
 	scrollbar-width: thin;

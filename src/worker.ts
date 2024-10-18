@@ -1,3 +1,7 @@
+/**
+ * @author tknight-dev
+ */
+
 import { GameEngine } from './game/game.engine';
 
 self.onmessage = (event: MessageEvent) => {

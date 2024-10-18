@@ -1,3 +1,7 @@
+/**
+ * @author tknight-dev
+ */
+
 import { GameEngine } from './game/game.engine';
 var globalPackageJSONVersion = require('../../package.json').version;
 
@@ -6,6 +10,7 @@ class Connect {
 	private elementBoard: HTMLElement;
 	private elementBoardGrid: HTMLElement;
 	private elementBoardGridCellsByPositionHash: { [key: number]: HTMLElement } = {};
+	private elementBoardGridCellsColorByPositionHash: { [key: number]: HTMLElement } = {};
 	private elementConnectSize: HTMLElement;
 	private elementDownload: HTMLElement;
 	private elementMenuDB: HTMLElement;
@@ -37,7 +42,7 @@ class Connect {
 	private gameConnectSize: number = 5;
 	private gameEngine: GameEngine = new GameEngine();
 	private showEvaluations: boolean = true;
-	private skill: number = 10;
+	private skill: number = 5;
 	private skillEngineAIML: boolean;
 	private spinnerStatus: boolean;
 	private workerData: string[] | {}[]; // csv | {}[json]
@@ -159,8 +164,9 @@ class Connect {
 			boardGridClick: any = t.boardGridClick,
 			elementBoardGrid: HTMLElement | null = t.elementBoardGrid,
 			elementTD: HTMLElement,
-			elementTDOnClickFunction: HTMLElement,
+			elementTDColor: HTMLElement,
 			elementTDCoordinate: HTMLElement,
+			elementTDOnClickFunction: HTMLElement,
 			elementTR: HTMLElement,
 			gameboardSizeA: number = t.gameboardSizeA,
 			gameboardSizeB: number = t.gameboardSizeB;
@@ -179,6 +185,7 @@ class Connect {
 
 		// Clean gameboard
 		t.elementBoardGridCellsByPositionHash = <any>new Object();
+		t.elementBoardGridCellsColorByPositionHash = <any>new Object();
 		t.resetDisplay(false);
 		while (elementBoardGrid.lastChild) {
 			elementBoardGrid.removeChild(elementBoardGrid.lastChild);
@@ -194,6 +201,7 @@ class Connect {
 
 				// Create elements
 				elementTD = document.createElement('td');
+				elementTDColor = document.createElement('div');
 				elementTDCoordinate = document.createElement('div');
 
 				// Style cell
@@ -201,16 +209,21 @@ class Connect {
 				elementTD.id = 'cell-' + positionHash;
 				elementTD.onclick = () => t.boardGridClick(positionHash);
 
+				// Style cell color
+				elementTDColor.className = 'color';
+
 				// Style cell coordinate
 				elementTDCoordinate.className = 'coordinate';
 				elementTDCoordinate.innerText = a + ',' + b;
 
 				// Append elements
+				elementTD.appendChild(elementTDColor);
 				elementTD.appendChild(elementTDCoordinate);
 				elementTR.appendChild(elementTD);
 
 				// Register element with position hash
 				t.elementBoardGridCellsByPositionHash[positionHash] = elementTD;
+				t.elementBoardGridCellsColorByPositionHash[positionHash] = elementTDColor;
 			}
 
 			// Append row
@@ -241,24 +254,62 @@ class Connect {
 			// Update gameEngine with placement
 			t.gameEngine.place(positionHash);
 
-			t.resetDisplay(true);
+			t.resetDisplay(true); // Shows the reset button
 		});
 	}
 
+	/**
+	 * @param positionHash the computer played this position
+	 */
 	private boardGridPlaced(positionHash: number): void {
 		let t = this,
+			colorMax: number = 255,
+			colorMin: number = 0,
+			elementBoardGridCellsColorByPositionHash: { [key: number]: HTMLElement } = t.elementBoardGridCellsColorByPositionHash,
 			elementTD: HTMLElement = t.elementBoardGridCellsByPositionHash[positionHash],
-			elementTDPiece: HTMLElement;
+			elementTDPiece: HTMLElement,
+			opacityMax: number = 75,
+			opacityMin: number = 0,
+			values: {
+				valuesByPositionHash: { [key: number]: { o: number; x: number } };
+				valuesO: {
+					max: number;
+					min: number;
+				};
+				valuesX: {
+					max: number;
+					min: number;
+				};
+			};
 
-		// Uncomment once engine is actually placing something
-		// // Remove clickable
-		// elementTD.className = '';
-		// elementTD.onclick = null;
+		// Remove clickable
+		elementTD.className = '';
+		elementTD.onclick = null;
 
-		// // Create/style/append piece element
-		// elementTDPiece = document.createElement('div');
-		// elementTDPiece.className = 'piece o';
-		// elementTD.appendChild(elementTDPiece);
+		// Create/style/append piece element
+		elementTDPiece = document.createElement('div');
+		elementTDPiece.className = 'piece o';
+		elementTD.appendChild(elementTDPiece);
+
+		if (t.showEvaluations) {
+			values = t.gameEngine.getValues();
+			let valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash,
+				valueEffO: number,
+				valueEffX: number,
+				valueEffT: number,
+				valuesOMax: number = values.valuesO.max,
+				valuesOMin: number = values.valuesO.min,
+				valuesXMax: number = values.valuesX.max,
+				valuesXMin: number = values.valuesX.min;
+
+			for (let [positionHash, evaluation] of Object.entries(valuesByPositionHash)) {
+				valueEffO = GameEngine.scale(evaluation.o, valuesOMax, valuesOMin, colorMax, colorMin, true);
+				valueEffX = GameEngine.scale(evaluation.x, valuesOMax, valuesOMin, colorMax, colorMin, true);
+				valueEffT = GameEngine.scale(valueEffO + valueEffX, colorMax * 2, colorMin, opacityMax, opacityMin, true);
+
+				elementBoardGridCellsColorByPositionHash[Number(positionHash)].style.backgroundColor = `rgba(${valueEffO}, ${valueEffX},0,${valueEffT / 100})`;
+			}
+		}
 
 		// Done
 		t.spinnerDisplay(false);
@@ -499,15 +550,15 @@ class Connect {
 				'_' +
 				String(date.getDay()).padStart(2, '0') +
 				'_' +
-				t.workerDataAmount +
-				'_' +
 				t.workerDataAmax +
 				'x' +
 				t.workerDataBmax +
-				'c' +
-				t.workerDataConnectSize;
+				'_c' +
+				t.workerDataConnectSize +
+				'_r' +
+				t.workerDataAmount;
 
-			if (!t.workerDataCSV) {
+			if (t.workerDataCSV) {
 				dataString = 'data:text/csv;charset=utf-8,' + workerData.join('');
 				filename += '.csv';
 			} else {

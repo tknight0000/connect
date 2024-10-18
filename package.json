@@ -1,5 +1,5 @@
 {
-  "author": "tknight0000",
+  "author": "tknight-dev",
   "description": "A connect 5 like game that supports customizable boards and connection sizes. It also can generate game play databases for AI/ML training.",
   "license": "MIT",
   "name": "connect",
