@@ -27,11 +27,13 @@ export class TraversalEngine {
 			masterTraversalSetAndChains: MasterTraversalSetAndChains = {
 				traversalSetAndChainsGroup: [],
 				winning: false,
+				winningO: undefined,
 				winningPositionHashes: undefined,
 			},
 			traversalSetAndChains: TraversalSetAndChains,
 			traversalSetAndChainsGroup: TraversalSetAndChains[],
 			winning: boolean = false,
+			winningO: boolean | undefined,
 			winningChains: number[],
 			winningPositionHashes: { [key: number]: null } | undefined = undefined; // key is positionHash
 
@@ -82,6 +84,10 @@ export class TraversalEngine {
 				for (j = 0; j < winningChains.length; j++) {
 					cells = traversalSetAndChains.chains[winningChains[j]].placement.cells;
 
+					if (winningO === undefined) {
+						winningO = traversalSetAndChains.chains[winningChains[j]].o;
+					}
+
 					// Iterate on the cells (positionHashes) within the winning chain
 					for (k = 0; k < cells.length; k++) {
 						winningPositionHashes[cells[k]] = null;
@@ -90,6 +96,7 @@ export class TraversalEngine {
 			}
 		}
 		masterTraversalSetAndChains.winning = winning;
+		masterTraversalSetAndChains.winningO = winningO;
 		if (winningPositionHashes) {
 			masterTraversalSetAndChains.winningPositionHashes = Object.keys(winningPositionHashes).map((v) => Number(v));
 		}

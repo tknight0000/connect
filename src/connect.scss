@@ -29,13 +29,20 @@ $connect-header-logo-width: 152px;
 	z-index: 1;
 
 	.board {
+		border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
+	}
+
+	.board,
+	.board-overlay,
+	.gameover {
 		bottom: 10px;
 		top: $connect-header-height + 20px;
 	}
 
 	.board,
+	.board-overlay,
+	.gameover,
 	.header {
-		border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
 		border-radius: 5px;
 		left: 10px;
 		position: absolute;
@@ -43,7 +50,42 @@ $connect-header-logo-width: 152px;
 		z-index: 1;
 	}
 
+	.board-overlay {
+		pointer-events: none;
+		z-index: 2;
+
+		&.dark {
+			left: 15px;
+			box-shadow: inset -5px -5px 5px 0 rgba(0, 0, 0, 0.25);
+			top: $connect-header-height + 25px;
+		}
+
+		&.light {
+			box-shadow: inset 5px 5px 5px 0 rgba(255, 255, 255, 0.1);
+		}
+	}
+
+	.gameover {
+		background-color: rgba(0, 0, 0, 0.1);
+		display: none;
+		z-index: 3;
+
+		&.animation {
+			background-color: transparent;
+			z-index: 4;
+		}
+
+		&.o {
+			box-shadow: inset 0 0 10px 15px rgba(176, 42, 67, 0.25);
+		}
+
+		&.x {
+			box-shadow: inset 0 0 10px 15px rgba(67, 176, 42, 0.25);
+		}
+	}
+
 	.header {
+		border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
 		height: $connect-header-height;
 		top: 10px;
 
@@ -294,7 +336,6 @@ $connect-header-logo-width: 152px;
 		}
 	}
 }
-
 .modal-settings {
 	display: none;
 	z-index: 2;

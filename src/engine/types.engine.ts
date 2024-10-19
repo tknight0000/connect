@@ -11,6 +11,7 @@ export type Dimensions = {
 export type MasterTraversalSetAndChains = {
 	traversalSetAndChainsGroup: TraversalSetAndChains[];
 	winning: boolean;
+	winningO: boolean | undefined;
 	winningPositionHashes: number[] | undefined;
 };
 

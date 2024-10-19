@@ -2,17 +2,22 @@
  * @author tknight-dev
  */
 
+import { Confetti } from './libs/confetti';
 import { GameEngine, WorkingDataValues } from './engine/game.engine';
 var globalPackageJSONVersion = require('../../package.json').version;
 
 // App
 class Connect {
+	private confetti: Confetti;
 	private elementBoard: HTMLElement;
 	private elementBoardGrid: HTMLElement;
 	private elementBoardGridCellsByPositionHash: { [key: number]: HTMLElement } = {};
 	private elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = {};
 	private elementConnectSize: HTMLElement;
 	private elementDownload: HTMLElement;
+	private elementGameOver: HTMLElement;
+	private elementGameOverCanvas: HTMLCanvasElement;
+	private elementGameOverCanvasContainer: HTMLElement;
 	private elementMenuDB: HTMLElement;
 	private elementMenuDBEnable: HTMLElement;
 	private elementMenuDBDisable: HTMLElement;
@@ -74,6 +79,9 @@ class Connect {
 		t.elementBoardGrid = <HTMLElement>document.getElementById('grid');
 		t.elementConnectSize = <HTMLElement>document.getElementById('connect-size');
 		t.elementDownload = <HTMLElement>document.getElementById('download');
+		t.elementGameOver = <HTMLElement>document.getElementById('gameover');
+		t.elementGameOverCanvas = <HTMLCanvasElement>document.getElementById('gameover-canvas');
+		t.elementGameOverCanvasContainer = <HTMLElement>document.getElementById('gameover-canvas-container');
 		t.elementMenuDB = <HTMLElement>document.getElementById('db');
 		t.elementMenuDBDisable = <HTMLElement>document.getElementById('db-click-disable');
 		t.elementMenuDBEnable = <HTMLElement>document.getElementById('db-click-enable');
@@ -98,6 +106,9 @@ class Connect {
 		t.elementSettings = <HTMLElement>document.getElementById('settings');
 		t.elementSpinner = <HTMLElement>document.getElementById('spinner');
 		t.elementVersion = <HTMLElement>document.getElementById('version');
+
+		// Register confetti
+		t.confetti = new Confetti(t.elementGameOverCanvas);
 
 		// Register onchanges
 		t.elementMenuDBFormSkill1Shuffle.onchange = (event: any) => {
@@ -127,6 +138,7 @@ class Connect {
 			return false;
 		};
 		t.elementMenuReset.onclick = () => {
+			t.gameOverDisplay(false, null);
 			t.boardGridBuild();
 		};
 		t.elementMenuSettingsDisable.onclick = () => {
@@ -187,6 +199,7 @@ class Connect {
 		// Clean gameboard
 		t.elementBoardGridCellsByPositionHash = <any>new Object();
 		t.elementBoardGridCellsColorByPositionHash = <any>new Object();
+		t.gameOverDisplay(false, null);
 		t.resetDisplay(false);
 		while (elementBoardGrid.lastChild) {
 			elementBoardGrid.removeChild(elementBoardGrid.lastChild);
@@ -751,10 +764,60 @@ class Connect {
 		}
 	}
 
-	private gameOver(xWon: boolean): void {
+	private gameOver(oWon: boolean, winningPostionHashes: number[]): void {
+		let t = this,
+			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash;
+
+		if (t.showEvaluations) {
+			// Update evaluation
+			for (let i in elementBoardGridCellsColorByPositionHash) {
+				elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
+				elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
+			}
+
+			for (let i = 0; i < winningPostionHashes.length; i++) {
+				if (oWon) {
+					elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].o.style.opacity = '50';
+				} else {
+					elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].x.style.opacity = '50';
+				}
+			}
+		}
+
+		// Done
+		t.gameOverDisplay(true, oWon);
+		t.spinnerDisplay(false);
+	}
+
+	private gameOverDisplay(active: boolean, oWon: boolean | null): void {
 		let t = this;
 
-		console.log('gameOver: x won is', xWon);
+		if (active) {
+			if (oWon) {
+				t.elementGameOver.className = 'gameover o';
+			} else {
+				t.elementGameOver.className = 'gameover x';
+			}
+
+			t.elementGameOver.style.display = 'block';
+			t.elementGameOver.style.opacity = '1';
+			t.elementGameOverCanvasContainer.style.display = 'block';
+			t.elementGameOverCanvasContainer.style.opacity = '1';
+
+			setTimeout(() => {
+				if (!oWon) {
+					t.confetti.trigger();
+				}
+			}, 1000);
+		} else {
+			t.elementGameOver.style.opacity = '0';
+			t.elementGameOverCanvasContainer.style.opacity = '0';
+			setTimeout(() => {
+				// Allow fade out
+				t.elementGameOver.style.display = 'none';
+				t.elementGameOverCanvasContainer.style.display = 'none';
+			}, 125);
+		}
 	}
 
 	private resetDisplay(active: boolean): void {

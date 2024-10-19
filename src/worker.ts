@@ -22,7 +22,7 @@ self.onmessage = (event: MessageEvent) => {
 		threadId: number = event.data.threadId;
 
 	// Set dumby callbacks (never called)
-	gameEngine.setCallbackGameOver(() => {
+	gameEngine.setCallbackGameOver((oWon: boolean, winningPostionHashes: number[]) => {
 		console.log('Thread-' + threadId + ': game over, post results');
 		amount++;
 		// self.postMessage({
