@@ -13,12 +13,12 @@ self.onmessage = (event: MessageEvent) => {
 		duationInMS: number = 30,
 		formatCSV: number = event.data.formatCSV,
 		gameEngine: GameEngine = new GameEngine(),
-		skill1: number = event.data.skill1,
-		skill1EngineAIML: boolean = event.data.skill1EngineAIML,
-		skill1Shuffle: boolean = event.data.skill1Shuffle,
-		skill2: number = event.data.skill2,
-		skill2EngineAIML: boolean = event.data.skill2EngineAIML,
-		skill2Shuffle: boolean = event.data.skill2Shuffle,
+		skillO: number = event.data.skillO,
+		skillOEngineAIML: boolean = event.data.skillOEngineAIML,
+		skillOShuffle: boolean = event.data.skillOShuffle,
+		skillX: number = event.data.skillX,
+		skillXEngineAIML: boolean = event.data.skillXEngineAIML,
+		skillXShuffle: boolean = event.data.skillXShuffle,
 		threadId: number = event.data.threadId;
 
 	// Set dumby callbacks (never called)
@@ -37,10 +37,10 @@ self.onmessage = (event: MessageEvent) => {
 			aMax,
 			bMax,
 			connectSize,
-			skill1Shuffle ? Math.floor(Math.random() * 10) + 1 : skill1,
-			skill1EngineAIML,
-			skill2Shuffle ? Math.floor(Math.random() * 10) + 1 : skill2,
-			skill2EngineAIML,
+			skillOShuffle ? Math.floor(Math.random() * 10) + 1 : skillO,
+			skillOEngineAIML,
+			skillXShuffle ? Math.floor(Math.random() * 10) + 1 : skillX,
+			skillXEngineAIML,
 		);
 
 		// TODO delete me

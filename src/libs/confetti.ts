@@ -42,7 +42,7 @@ export class Confetti {
 
 		//----------Resize----------
 		window.addEventListener('resize', () => {
-			this.resizeCanvas();
+			t.resizeCanvas();
 		});
 	}
 
@@ -50,6 +50,7 @@ export class Confetti {
 	public trigger(): void {
 		let t = this;
 
+		t.confetti = new Array();
 		t.initConfetti();
 		t.render();
 	}

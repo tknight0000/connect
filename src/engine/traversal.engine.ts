@@ -178,7 +178,7 @@ export class TraversalEngine {
 				// free cell
 				gap++;
 
-				if (chainLast && A === aMaxEff - 1) {
+				if (chainLast && A === aMaxEff) {
 					// Last iteration, update last chain's gap after
 					chainLast.placement.gapAfter = gap;
 				} else {
@@ -188,6 +188,11 @@ export class TraversalEngine {
 					chainCurrent = undefined;
 				}
 			}
+		}
+		if (chains.length) {
+			// The last chain may not have its gapAfter set
+			chainLast = chains[chains.length - 1];
+			chainLast.placement.gapAfter = set.length - 1 - (chainLast.placement.index + (chainLast.placement.cells.length - 1));
 		}
 
 		TraversalEngine.setWinners(dimensions.connectSize, traversalSetAndChains);
@@ -255,7 +260,7 @@ export class TraversalEngine {
 				// free cell
 				gap++;
 
-				if (chainLast && B === bMaxEff - 1) {
+				if (chainLast && B === bMaxEff) {
 					// Last iteration, update last chain's gap after
 					chainLast.placement.gapAfter = gap;
 				} else {
@@ -265,6 +270,11 @@ export class TraversalEngine {
 					chainCurrent = undefined;
 				}
 			}
+		}
+		if (chains.length) {
+			// The last chain may not have its gapAfter set
+			chainLast = chains[chains.length - 1];
+			chainLast.placement.gapAfter = set.length - 1 - (chainLast.placement.index + (chainLast.placement.cells.length - 1));
 		}
 
 		TraversalEngine.setWinners(dimensions.connectSize, traversalSetAndChains);
@@ -321,7 +331,7 @@ export class TraversalEngine {
 							cells: [positionHash],
 							gapAfter: 0,
 							gapBefore: gap,
-							index: A, // B works here too
+							index: Math.min(A, B),
 						},
 					};
 					chains.push(chainCurrent);
@@ -334,7 +344,7 @@ export class TraversalEngine {
 				// free cell
 				gap++;
 
-				if (chainLast && (A === aMaxEff - 1 || B === bMaxEff - 1)) {
+				if (chainLast && (A === aMaxEff || B === bMaxEff)) {
 					// Last iteration, update last chain's gap after
 					chainLast.placement.gapAfter = gap;
 				} else {
@@ -344,6 +354,11 @@ export class TraversalEngine {
 					chainCurrent = undefined;
 				}
 			}
+		}
+		if (chains.length) {
+			// The last chain may not have its gapAfter set
+			chainLast = chains[chains.length - 1];
+			chainLast.placement.gapAfter = set.length - 1 - (chainLast.placement.index + (chainLast.placement.cells.length - 1));
 		}
 
 		TraversalEngine.setWinners(dimensions.connectSize, traversalSetAndChains);
@@ -401,7 +416,7 @@ export class TraversalEngine {
 							cells: [positionHash],
 							gapAfter: 0,
 							gapBefore: gap,
-							index: A, // B works here too
+							index: Math.min(A, bMax - B),
 						},
 					};
 					chains.push(chainCurrent);
@@ -414,7 +429,7 @@ export class TraversalEngine {
 				// free cell
 				gap++;
 
-				if (chainLast && (A === aMaxEff - 1 || B === 0)) {
+				if (chainLast && (A === aMaxEff || B === -1)) {
 					// Last iteration, update last chain's gap after
 					chainLast.placement.gapAfter = gap;
 				} else {
@@ -424,6 +439,11 @@ export class TraversalEngine {
 					chainCurrent = undefined;
 				}
 			}
+		}
+		if (chains.length) {
+			// The last chain may not have its gapAfter set
+			chainLast = chains[chains.length - 1];
+			chainLast.placement.gapAfter = set.length - 1 - (chainLast.placement.index + (chainLast.placement.cells.length - 1));
 		}
 
 		TraversalEngine.setWinners(dimensions.connectSize, traversalSetAndChains);

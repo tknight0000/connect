@@ -3,6 +3,7 @@
 <html lang="en">
 	<head>
   		<base href="/">
+  		<link rel="icon" href="./favicon.ico" type="image/x-icon">
 		<link rel="preconnect" href="https://fonts.gstatic.com">
 		<link rel="stylesheet" href="./connect.css">
 		<link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Lato:400,700" type='text/css'>
@@ -20,16 +21,17 @@
 			<div class="header">
 				<div class="wrapper">
 					<div class="logo">
-	        			<div class="image"></div>
+	        			<a class="image" href="https://tknight.dev"></a>
 					</div>
 					<div id="connect-size" class="connect-size">
 						Connect 5
 					</div>
 					<div class="content">
-						<span class="hyperlink" id="reset-click" style="visibility: hidden;">Reset</span>
-						<span class="hyperlink" id="db-click-enable">DB</span>
-						<span class="hyperlink" id="info-click">Info</span>
-						<span class="hyperlink" id="settings-click-enable">Settings</span>
+						<span class="hyperlink menu" id="menu-click">Menu</span>
+						<span class="hyperlink menu-item" id="reset-click" style="visibility: hidden;">Reset</span>
+						<span class="hyperlink menu-item" id="db-click-enable">DB</span>
+						<span class="hyperlink menu-item" id="info-click">Info</span>
+						<span class="hyperlink menu-item" id="settings-click-enable">Settings</span>
 					</div>
 				</div>
 			</div>
@@ -100,28 +102,28 @@
 										</td>
 									</tr>
 									<tr>
-										<td>Skill P1</td>
+										<td>Skill O</td>
 										<td>
-											<input id="dbFormSkill1" min=1 max=5 name="skill" type="range" value=5 disabled />
+											<input id="dbFormSkillO" min=1 max=5 name="skill" type="range" value=5 disabled />
 										</td>
 									</tr>
 									<tr>
-										<td>Skill P1 Engine</td>
+										<td>Skill O Engine</td>
 										<td class="radio-spread">
 											<span>
 												AI/ML
-												<input name="dbFormSkill1Engine" type="radio" disabled />
+												<input name="dbFormSkillOEngine" type="radio" disabled />
 											</span>
 											<span>
 												Linear
-												<input name="dbFormSkill1Engine" type="radio" checked disabled />
+												<input name="dbFormSkillOEngine" type="radio" checked disabled />
 											</span>
 										</td>
 									</tr>
 									<tr>
-										<td>Skill P1 Shuffle</td>
+										<td>Skill O Shuffle</td>
 										<td>
-											<input id="dbFormSkill1Shuffle" name="skillShuffle" type="checkbox" checked />
+											<input id="dbFormSkillOShuffle" name="skillShuffle" type="checkbox" checked />
 										</td>
 									</tr>
 									<tr>
@@ -133,28 +135,28 @@
 										</td>
 									</tr>
 									<tr>
-										<td>Skill P2</td>
+										<td>Skill X</td>
 										<td>
-											<input id="dbFormSkill2" min=1 max=5 name="skill" type="range" value=5 disabled />
+											<input id="dbFormSkillX" min=1 max=5 name="skill" type="range" value=5 disabled />
 										</td>
 									</tr>
 									<tr>
-										<td>Skill P2 Engine</td>
+										<td>Skill X Engine</td>
 										<td class="radio-spread">
 											<span>
 												AI/ML
-												<input name="dbFormSkill2Engine" type="radio" disabled />
+												<input name="dbFormSkillXEngine" type="radio" disabled />
 											</span>
 											<span>
 												Linear
-												<input name="dbFormSkill2Engine" type="radio" checked disabled />
+												<input name="dbFormSkillXEngine" type="radio" checked disabled />
 											</span>
 										</td>
 									</tr>
 									<tr>
-										<td>Skill P2 Shuffle</td>
+										<td>Skill X Shuffle</td>
 										<td>
-											<input id="dbFormSkill2Shuffle" name="skillShuffle" type="checkbox" checked />
+											<input id="dbFormSkillXShuffle" name="skillShuffle" type="checkbox" checked />
 										</td>
 									</tr>
 									<tr>

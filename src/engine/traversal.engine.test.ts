@@ -19,14 +19,8 @@ let dimensions: Dimensions = {
 		positionHashesByValues: {},
 		values: {
 			valuesByPositionHash: {},
-			valuesO: {
-				max: 0,
-				min: 0,
-			},
-			valuesX: {
-				max: 0,
-				min: 0,
-			},
+			valuesOMax: 0,
+			valuesXMax: 0,
 		},
 	};
 
@@ -108,6 +102,7 @@ describe('GameEngine: Traversal', () => {
 		placementsByPositionHash[hashTo(6, 0)] = false;
 		placementsByPositionHash[hashTo(dimensions.aMax, 0)] = true;
 		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
 
 		// Generate chains
 		traversalSetAndChains = TraversalEngine.getByType1H(dimensions, hashTo(0, 0), workingData);
@@ -163,6 +158,63 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[4].placement.gapAfter).toBe(0);
 		expect(traversalSetAndChains.chains[4].placement.gapBefore).toBe(2);
 		expect(traversalSetAndChains.chains[4].placement.index).toBe(dimensions.aMax);
+
+		// Prepare placements
+		placementsByPositionHash = <any>new Object();
+		placementsByPositionHash[hashTo(1, 0)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+
+		/*
+		 * Strange
+		 */
+
+		// Prepare placements
+		placementsByPositionHash = <any>new Object();
+		placementsByPositionHash[hashTo(0, 3)] = false;
+		placementsByPositionHash[hashTo(1, 3)] = false;
+		placementsByPositionHash[hashTo(3, 3)] = false;
+		placementsByPositionHash[hashTo(4, 3)] = false;
+		placementsByPositionHash[hashTo(7, 3)] = false;
+		placementsByPositionHash[hashTo(8, 3)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChains = TraversalEngine.getByType1H(dimensions, hashTo(0, 3), workingData);
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(traversalSetAndChains.set.length).toBe(dimensions.aMax + 1);
+		expect(traversalSetAndChains.type).toBe(TraversalType.TYPE1_H);
+		expect(traversalSetAndChains.winning).toBe(false);
+		expect(traversalSetAndChains.winningChains).toBe(undefined);
+
+		// Evaluate chains
+		expect(traversalSetAndChains.chains.length).toBe(3);
+
+		// Evaluate chains: Chain[0]
+		expect(traversalSetAndChains.chains[0].o).toBe(false);
+		expect(traversalSetAndChains.chains[0].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(0, 3));
+		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(0);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(0);
+
+		// Evaluate chains: Chain[1]
+		expect(traversalSetAndChains.chains[1].o).toBe(false);
+		expect(traversalSetAndChains.chains[1].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.cells[0]).toBe(hashTo(3, 3));
+		expect(traversalSetAndChains.chains[1].placement.gapAfter).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.gapBefore).toBe(1);
+		expect(traversalSetAndChains.chains[1].placement.index).toBe(3);
+
+		// Evaluate chains: Chain[2]
+		expect(traversalSetAndChains.chains[2].o).toBe(false);
+		expect(traversalSetAndChains.chains[2].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.cells[0]).toBe(hashTo(7, 3));
+		expect(traversalSetAndChains.chains[2].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[2].placement.gapBefore).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.index).toBe(7);
 	});
 
 	test('Type1-H Winning Chain', () => {
@@ -353,6 +405,57 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[4].placement.gapAfter).toBe(0);
 		expect(traversalSetAndChains.chains[4].placement.gapBefore).toBe(2);
 		expect(traversalSetAndChains.chains[4].placement.index).toBe(dimensions.bMax);
+
+		/*
+		 * Strange
+		 */
+
+		// Prepare placements
+		placementsByPositionHash = <any>new Object();
+		placementsByPositionHash[hashTo(3, 0)] = false;
+		placementsByPositionHash[hashTo(3, 1)] = false;
+		placementsByPositionHash[hashTo(3, 3)] = false;
+		placementsByPositionHash[hashTo(3, 4)] = false;
+		placementsByPositionHash[hashTo(3, 7)] = false;
+		placementsByPositionHash[hashTo(3, 8)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+
+		// Generate chains
+		traversalSetAndChains = TraversalEngine.getByType2V(dimensions, hashTo(3, 0), workingData);
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(traversalSetAndChains.set.length).toBe(dimensions.aMax + 1);
+		expect(traversalSetAndChains.type).toBe(TraversalType.TYPE2_V);
+		expect(traversalSetAndChains.winning).toBe(false);
+		expect(traversalSetAndChains.winningChains).toBe(undefined);
+
+		// Evaluate chains
+		expect(traversalSetAndChains.chains.length).toBe(3);
+
+		// Evaluate chains: Chain[0]
+		expect(traversalSetAndChains.chains[0].o).toBe(false);
+		expect(traversalSetAndChains.chains[0].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(3, 0));
+		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(0);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(0);
+
+		// Evaluate chains: Chain[1]
+		expect(traversalSetAndChains.chains[1].o).toBe(false);
+		expect(traversalSetAndChains.chains[1].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.cells[0]).toBe(hashTo(3, 3));
+		expect(traversalSetAndChains.chains[1].placement.gapAfter).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.gapBefore).toBe(1);
+		expect(traversalSetAndChains.chains[1].placement.index).toBe(3);
+
+		// Evaluate chains: Chain[2]
+		expect(traversalSetAndChains.chains[2].o).toBe(false);
+		expect(traversalSetAndChains.chains[2].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.cells[0]).toBe(hashTo(3, 7));
+		expect(traversalSetAndChains.chains[2].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[2].placement.gapBefore).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.index).toBe(7);
 	});
 
 	test('Type2-V Winning Chain', () => {
@@ -479,6 +582,40 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(8);
 		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(1);
 		expect(traversalSetAndChains.chains[0].placement.index).toBe(1);
+	});
+
+	test('Type3-D Single Chain (2)', () => {
+		let placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			positionStartA: number,
+			positionStartB: number,
+			traversalSetAndChains: TraversalSetAndChains;
+
+		// Prepare placements
+		positionStartA = 1;
+		positionStartB = 0;
+		placementsByPositionHash[hashTo(3, 2)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+
+		// Generate chains
+		traversalSetAndChains = TraversalEngine.getByType3D(dimensions, hashTo(positionStartA, positionStartB), workingData);
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(traversalSetAndChains.set.length).toBe(Math.min(dimensions.aMax - positionStartA, dimensions.bMax - positionStartB) + 1);
+		expect(traversalSetAndChains.type).toBe(TraversalType.TYPE3_D);
+		expect(traversalSetAndChains.winning).toBe(false);
+		expect(traversalSetAndChains.winningChains).toBe(undefined);
+
+		// Evaluate chains
+		expect(traversalSetAndChains.chains.length).toBe(1);
+
+		// Evaluate chains: Chain[0]
+		expect(traversalSetAndChains.chains[0].o).toBe(false);
+		expect(traversalSetAndChains.chains[0].placement.cells.length).toBe(1);
+		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(3, 2));
+		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(6);
+		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(2);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(2);
 	});
 
 	test('Type3-D Single Chain Offset', () => {
@@ -623,6 +760,57 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[4].placement.gapAfter).toBe(0);
 		expect(traversalSetAndChains.chains[4].placement.gapBefore).toBe(2);
 		expect(traversalSetAndChains.chains[4].placement.index).toBe(Math.min(dimensions.aMax, dimensions.bMax));
+
+		/*
+		 * Strange
+		 */
+
+		// Prepare placements
+		placementsByPositionHash = <any>new Object();
+		placementsByPositionHash[hashTo(0, 0)] = false;
+		placementsByPositionHash[hashTo(1, 1)] = false;
+		placementsByPositionHash[hashTo(3, 3)] = false;
+		placementsByPositionHash[hashTo(4, 4)] = false;
+		placementsByPositionHash[hashTo(7, 7)] = false;
+		placementsByPositionHash[hashTo(8, 8)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+
+		// Generate chains
+		traversalSetAndChains = TraversalEngine.getByType3D(dimensions, hashTo(0, 0), workingData);
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(traversalSetAndChains.set.length).toBe(dimensions.aMax + 1);
+		expect(traversalSetAndChains.type).toBe(TraversalType.TYPE3_D);
+		expect(traversalSetAndChains.winning).toBe(false);
+		expect(traversalSetAndChains.winningChains).toBe(undefined);
+
+		// Evaluate chains
+		expect(traversalSetAndChains.chains.length).toBe(3);
+
+		// Evaluate chains: Chain[0]
+		expect(traversalSetAndChains.chains[0].o).toBe(false);
+		expect(traversalSetAndChains.chains[0].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(0, 0));
+		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(0);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(0);
+
+		// Evaluate chains: Chain[1]
+		expect(traversalSetAndChains.chains[1].o).toBe(false);
+		expect(traversalSetAndChains.chains[1].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.cells[0]).toBe(hashTo(3, 3));
+		expect(traversalSetAndChains.chains[1].placement.gapAfter).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.gapBefore).toBe(1);
+		expect(traversalSetAndChains.chains[1].placement.index).toBe(3);
+
+		// Evaluate chains: Chain[2]
+		expect(traversalSetAndChains.chains[2].o).toBe(false);
+		expect(traversalSetAndChains.chains[2].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.cells[0]).toBe(hashTo(7, 7));
+		expect(traversalSetAndChains.chains[2].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[2].placement.gapBefore).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.index).toBe(7);
 	});
 
 	test('Type3-D Multi Chain Offset', () => {
@@ -867,7 +1055,7 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(1, dimensions.bMax));
 		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(8);
 		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(0);
-		expect(traversalSetAndChains.chains[0].placement.index).toBe(1);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(0);
 
 		/*
 		 * Gapped
@@ -899,7 +1087,7 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(2, dimensions.bMax - 1));
 		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(7);
 		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(1);
-		expect(traversalSetAndChains.chains[0].placement.index).toBe(2);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(1);
 	});
 
 	test('Type4-U Multi Chain', () => {
@@ -974,6 +1162,57 @@ describe('GameEngine: Traversal', () => {
 		expect(traversalSetAndChains.chains[4].placement.gapAfter).toBe(0);
 		expect(traversalSetAndChains.chains[4].placement.gapBefore).toBe(2);
 		expect(traversalSetAndChains.chains[4].placement.index).toBe(dimensions.aMax);
+
+		/*
+		 * Strange
+		 */
+
+		// Prepare placements
+		placementsByPositionHash = <any>new Object();
+		placementsByPositionHash[hashTo(0, dimensions.bMax)] = false;
+		placementsByPositionHash[hashTo(1, dimensions.bMax - 1)] = false;
+		placementsByPositionHash[hashTo(3, dimensions.bMax - 3)] = false;
+		placementsByPositionHash[hashTo(4, dimensions.bMax - 4)] = false;
+		placementsByPositionHash[hashTo(7, dimensions.bMax - 7)] = false;
+		placementsByPositionHash[hashTo(8, dimensions.bMax - 8)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+
+		// Generate chains
+		traversalSetAndChains = TraversalEngine.getByType4U(dimensions, hashTo(0, dimensions.bMax), workingData);
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate meta
+		expect(traversalSetAndChains.set.length).toBe(dimensions.aMax + 1);
+		expect(traversalSetAndChains.type).toBe(TraversalType.TYPE4_U);
+		expect(traversalSetAndChains.winning).toBe(false);
+		expect(traversalSetAndChains.winningChains).toBe(undefined);
+
+		// Evaluate chains
+		expect(traversalSetAndChains.chains.length).toBe(3);
+
+		// Evaluate chains: Chain[0]
+		expect(traversalSetAndChains.chains[0].o).toBe(false);
+		expect(traversalSetAndChains.chains[0].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[0].placement.cells[0]).toBe(hashTo(0, dimensions.bMax));
+		expect(traversalSetAndChains.chains[0].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[0].placement.gapBefore).toBe(0);
+		expect(traversalSetAndChains.chains[0].placement.index).toBe(0);
+
+		// Evaluate chains: Chain[1]
+		expect(traversalSetAndChains.chains[1].o).toBe(false);
+		expect(traversalSetAndChains.chains[1].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.cells[0]).toBe(hashTo(3, dimensions.bMax - 3));
+		expect(traversalSetAndChains.chains[1].placement.gapAfter).toBe(2);
+		expect(traversalSetAndChains.chains[1].placement.gapBefore).toBe(1);
+		expect(traversalSetAndChains.chains[1].placement.index).toBe(3);
+
+		// Evaluate chains: Chain[2]
+		expect(traversalSetAndChains.chains[2].o).toBe(false);
+		expect(traversalSetAndChains.chains[2].placement.cells.length).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.cells[0]).toBe(hashTo(7, dimensions.bMax - 7));
+		expect(traversalSetAndChains.chains[2].placement.gapAfter).toBe(1);
+		expect(traversalSetAndChains.chains[2].placement.gapBefore).toBe(2);
+		expect(traversalSetAndChains.chains[2].placement.index).toBe(7);
 	});
 
 	test('Type4-U Multi Chain Offset', () => {

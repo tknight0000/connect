@@ -2,6 +2,13 @@
  * @author tknight-dev
  */
 
+export enum AlgorithmType {
+	TYPE1_VIABILITY,
+	TYPE2_ONETOWIN,
+	TYPE3_SINGLEGAP,
+	TYPE4_ECHOS,
+}
+
 export type Dimensions = {
 	aMax: number;
 	bMax: number;
@@ -51,12 +58,6 @@ export type WorkingData = {
 
 export type WorkingDataValues = {
 	valuesByPositionHash: { [key: number]: { o: number; x: number } };
-	valuesO: {
-		max: number;
-		min: number;
-	};
-	valuesX: {
-		max: number;
-		min: number;
-	};
+	valuesOMax: number;
+	valuesXMax: number;
 };

@@ -6,12 +6,14 @@
 
 import { Dimensions, WorkingData } from './types.engine';
 
-export class SkillLinearEngine {
+export class SkillEngine {
 	// // _5 is expert (perfect)
 	// private static _4: number[] = [0, 5, 20, 75];
 	// private static _3: number[] = [25, 45, 25, 5];
 	// private static _2: number[] = [50, 37, 10, 3];
 	// // _1 is noob (random)
+
+	// skill determines what percentage from perfect a placement is allowed to be made
 
 	/**
 	 * @return is positionHash

@@ -2,7 +2,8 @@
  * @author tknight-dev
  */
 
-import { SkillLinearEngine } from './skill-linear.engine';
+import { EvaluationLinearEngine } from './evaluation.linear.engine';
+import { SkillEngine } from './skill.engine';
 import { TraversalEngine } from './traversal.engine';
 export { WorkingDataValues } from './types.engine'; // Make available under this primary module
 import { Dimensions, MasterTraversalSetAndChains, WorkingData, WorkingDataValues } from './types.engine';
@@ -15,10 +16,10 @@ export class GameEngine {
 	private human: boolean = false; // human implies X piece
 	private humanWon: boolean = false; // human implies X piece
 	private initialized: boolean = false;
-	private skill1: number = 5;
-	private skill1EngineAIML: boolean = false;
-	private skill2: number = 5;
-	private skill2EngineAIML: boolean = false;
+	private skillO: number = 5;
+	private skillOEngineAIML: boolean = false;
+	private skillX: number = 5;
+	private skillXEngineAIML: boolean = false;
 	private workingData: WorkingData;
 
 	/**
@@ -31,13 +32,11 @@ export class GameEngine {
 			masterSet: MasterTraversalSetAndChains;
 
 		masterSet = TraversalEngine.masterSet(t.dimensions, t.workingData);
-		console.log('masterSet', masterSet);
 
 		if (masterSet.winning) {
 			t.gameOver = true;
 
 			if (t.callbackGameOver) {
-				// The computer played this position
 				t.callbackGameOver(<boolean>masterSet.winningO, <number[]>masterSet.winningPositionHashes);
 			} else {
 				console.error('GameEngine > place: no game over callback set');
@@ -45,9 +44,8 @@ export class GameEngine {
 
 			return false;
 		} else {
-			// evaluate positions
-			// call skill system to make placement determination /// don't do this here
-			// return placement /// don't do this here
+			// Evaluate Positions
+			EvaluationLinearEngine.calc(t.dimensions, masterSet, t.workingData);
 
 			return true;
 		}
@@ -57,10 +55,10 @@ export class GameEngine {
 		aMax: number,
 		bMax: number,
 		connectSize: number,
-		skill1: number,
-		skill1EngineAIML: boolean,
-		skill2: number = -1,
-		skill2EngineAIML: boolean = false,
+		skillO: number,
+		skillOEngineAIML: boolean,
+		skillX: number = -1,
+		skillXEngineAIML: boolean = false,
 	): void {
 		let t = this,
 			dimensions: Dimensions = {
@@ -70,11 +68,11 @@ export class GameEngine {
 			};
 
 		t.dimensions = dimensions;
-		t.human = skill2 === -1;
-		t.skill1 = skill1;
-		t.skill1EngineAIML = skill1EngineAIML;
-		t.skill2 = skill2;
-		t.skill2EngineAIML = skill2EngineAIML;
+		t.human = skillX === -1;
+		t.skillO = skillO;
+		t.skillOEngineAIML = skillOEngineAIML;
+		t.skillX = skillX;
+		t.skillXEngineAIML = skillXEngineAIML;
 		t.initialized = true;
 
 		t.reset();
@@ -123,20 +121,14 @@ export class GameEngine {
 			positionHashesByValues: positionHashesByValues,
 			values: {
 				valuesByPositionHash: valuesByPositionHash,
-				valuesO: {
-					max: 0,
-					min: 0,
-				},
-				valuesX: {
-					max: 0,
-					min: 0,
-				},
+				valuesOMax: 0,
+				valuesXMax: 0,
 			},
 		};
 
 		if (!t.human) {
 			// computer place first
-			positionHash = SkillLinearEngine.placeFirst(t.dimensions, t.skill1, t.workingData);
+			positionHash = SkillEngine.placeFirst(t.dimensions, t.skillX, t.workingData);
 
 			// TODO
 			// while(!t.gameOver) {
@@ -183,19 +175,19 @@ export class GameEngine {
 		 *
 		 * TMP: START
 		 */
-		let x: number, o: number;
-		for (let i in t.workingData.values.valuesByPositionHash) {
-			x = Math.floor(Math.random() * 91);
-			o = Math.floor(Math.random() * 91);
+		// let x: number, o: number;
+		// for (let i in t.workingData.values.valuesByPositionHash) {
+		// 	x = Math.floor(Math.random() * 91);
+		// 	o = Math.floor(Math.random() * 91);
 
-			t.workingData.values.valuesByPositionHash[i].x = x;
-			t.workingData.values.valuesByPositionHash[i].o = o;
+		// 	t.workingData.values.valuesByPositionHash[i].x = x;
+		// 	t.workingData.values.valuesByPositionHash[i].o = o;
 
-			t.workingData.values.valuesO.max = Math.max(t.workingData.values.valuesO.max, o);
-			t.workingData.values.valuesO.min = Math.min(t.workingData.values.valuesO.min, o);
-			t.workingData.values.valuesX.max = Math.max(t.workingData.values.valuesX.max, x);
-			t.workingData.values.valuesX.min = Math.min(t.workingData.values.valuesX.min, x);
-		}
+		// 	t.workingData.values.valuesO.max = Math.max(t.workingData.values.valuesO.max, o);
+		// 	t.workingData.values.valuesO.min = Math.min(t.workingData.values.valuesO.min, o);
+		// 	t.workingData.values.valuesX.max = Math.max(t.workingData.values.valuesX.max, x);
+		// 	t.workingData.values.valuesX.min = Math.min(t.workingData.values.valuesX.min, x);
+		// }
 
 		let keys: string[] = Object.keys(t.workingData.placementsAvailableByPositionHash);
 		positionHash = Number(keys[(keys.length * Math.random()) << 0]);

@@ -31,10 +31,10 @@ class Connect {
 	private elementMenuSettingsForm: HTMLFormElement;
 	private elementMenuSettingsFormApply: HTMLElement;
 	private elementMenuSettingsFormCancel: HTMLElement;
-	private elementMenuDBFormSkill1: HTMLInputElement;
-	private elementMenuDBFormSkill1Shuffle: HTMLInputElement;
-	private elementMenuDBFormSkill2: HTMLInputElement;
-	private elementMenuDBFormSkill2Shuffle: HTMLInputElement;
+	private elementMenuDBFormSkillO: HTMLInputElement;
+	private elementMenuDBFormSkillOShuffle: HTMLInputElement;
+	private elementMenuDBFormSkillX: HTMLInputElement;
+	private elementMenuDBFormSkillXShuffle: HTMLInputElement;
 	private elementMenuDBProgress: HTMLElement;
 	private elementMenuDBProgressContainer: HTMLElement;
 	private elementMenuDBProgressCancel: HTMLInputElement;
@@ -88,10 +88,10 @@ class Connect {
 		t.elementMenuDBForm = <HTMLFormElement>document.getElementById('dbForm');
 		t.elementMenuDBFormApply = <HTMLElement>document.getElementById('dbFormApply');
 		t.elementMenuDBFormCancel = <HTMLElement>document.getElementById('dbFormCancel');
-		t.elementMenuDBFormSkill1 = <HTMLInputElement>document.getElementById('dbFormSkill1');
-		t.elementMenuDBFormSkill1Shuffle = <HTMLInputElement>document.getElementById('dbFormSkill1Shuffle');
-		t.elementMenuDBFormSkill2 = <HTMLInputElement>document.getElementById('dbFormSkill2');
-		t.elementMenuDBFormSkill2Shuffle = <HTMLInputElement>document.getElementById('dbFormSkill2Shuffle');
+		t.elementMenuDBFormSkillO = <HTMLInputElement>document.getElementById('dbFormSkillO');
+		t.elementMenuDBFormSkillOShuffle = <HTMLInputElement>document.getElementById('dbFormSkillOShuffle');
+		t.elementMenuDBFormSkillX = <HTMLInputElement>document.getElementById('dbFormSkillX');
+		t.elementMenuDBFormSkillXShuffle = <HTMLInputElement>document.getElementById('dbFormSkillXShuffle');
 		t.elementMenuDBProgress = <HTMLElement>document.getElementById('dbProgress');
 		t.elementMenuDBProgressContainer = <HTMLElement>document.getElementById('dbProgressContainer');
 		t.elementMenuDBProgressCancel = <HTMLInputElement>document.getElementById('db-progress-click-cancel');
@@ -111,11 +111,11 @@ class Connect {
 		t.confetti = new Confetti(t.elementGameOverCanvas);
 
 		// Register onchanges
-		t.elementMenuDBFormSkill1Shuffle.onchange = (event: any) => {
-			t.elementMenuDBFormSkill1.disabled = (<HTMLInputElement>event.target).checked;
+		t.elementMenuDBFormSkillOShuffle.onchange = (event: any) => {
+			t.elementMenuDBFormSkillO.disabled = (<HTMLInputElement>event.target).checked;
 		};
-		t.elementMenuDBFormSkill2Shuffle.onchange = (event: any) => {
-			t.elementMenuDBFormSkill2.disabled = (<HTMLInputElement>event.target).checked;
+		t.elementMenuDBFormSkillXShuffle.onchange = (event: any) => {
+			t.elementMenuDBFormSkillX.disabled = (<HTMLInputElement>event.target).checked;
 		};
 
 		// Register onclicks
@@ -165,6 +165,15 @@ class Connect {
 			return false;
 		};
 
+		// Shrink game board is taller than wider
+		if (window.innerWidth < window.innerHeight) {
+			console.log('vertical mode activated');
+			t.gameboardSizeA = 5;
+			t.gameConnectSize = 3;
+			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
+		}
+
+		// Display Version
 		t.elementVersion.innerText = 'v' + globalPackageJSONVersion;
 
 		// Create gameboard grid
@@ -307,14 +316,12 @@ class Connect {
 					opacityO: number,
 					opacityX: number,
 					valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash,
-					valuesOMax: number = values.valuesO.max,
-					valuesOMin: number = values.valuesO.min,
-					valuesXMax: number = values.valuesX.max,
-					valuesXMin: number = values.valuesX.min;
+					valuesOMax: number = values.valuesOMax,
+					valuesXMax: number = values.valuesXMax;
 
 				for (let [positionHash, evaluation] of Object.entries(valuesByPositionHash)) {
-					opacityO = GameEngine.scale(evaluation.o, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
-					opacityX = GameEngine.scale(evaluation.x, valuesOMax, valuesOMin, opacityMax, opacityMin, true);
+					opacityO = GameEngine.scale(evaluation.o, valuesOMax, 0, opacityMax, opacityMin, true);
+					opacityX = GameEngine.scale(evaluation.x, valuesXMax, 0, opacityMax, opacityMin, true);
 
 					elements = elementBoardGridCellsColorByPositionHash[Number(positionHash)];
 					elements.o.style.opacity = String(opacityO / 100);
@@ -336,12 +343,12 @@ class Connect {
 			boardB: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[1],
 			connectSize: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[3],
 			format: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[4],
-			skill1: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[6],
-			skill1EngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[7],
-			skill1Shuffle: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[9],
-			skill2: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[10],
-			skill2EngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[11],
-			skill2Shuffle: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[13],
+			skillO: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[6],
+			skillOEngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[7],
+			skillOShuffle: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[9],
+			skillX: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[10],
+			skillXEngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[11],
+			skillXShuffle: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[13],
 			threads: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[14];
 
 		t.dbApplyWebWorkers(
@@ -350,12 +357,12 @@ class Connect {
 			Number(boardB.value),
 			Number(connectSize.value),
 			Boolean(format.checked),
-			Number(skill1.value),
-			Boolean(skill1EngineAIML.checked),
-			Boolean(skill1Shuffle.checked),
-			Number(skill2.value),
-			Boolean(skill2EngineAIML.checked),
-			Boolean(skill2Shuffle.checked),
+			Number(skillO.value),
+			Boolean(skillOEngineAIML.checked),
+			Boolean(skillOShuffle.checked),
+			Number(skillX.value),
+			Boolean(skillXEngineAIML.checked),
+			Boolean(skillXShuffle.checked),
 			Number(threads.value),
 		);
 	}
@@ -366,12 +373,12 @@ class Connect {
 		bMax: number,
 		connectSize: number,
 		formatCSV: boolean,
-		skill1: number,
-		skill1EngineAIML: boolean,
-		skill1Shuffle: boolean,
-		skill2: number,
-		skill2EngineAIML: boolean,
-		skill2Shuffle: boolean,
+		skillO: number,
+		skillOEngineAIML: boolean,
+		skillOShuffle: boolean,
+		skillX: number,
+		skillXEngineAIML: boolean,
+		skillXShuffle: boolean,
 		threads: number,
 	): void {
 		let t = this,
@@ -438,12 +445,12 @@ class Connect {
 					bMax: bMax,
 					connectSize: connectSize,
 					formatCSV: formatCSV,
-					skill1: skill1,
-					skill1EngineAIML: skill1EngineAIML,
-					skill1Shuffle: skill1Shuffle,
-					skill2: skill2,
-					skill2EngineAIML: skill2EngineAIML,
-					skill2Shuffle: skill2Shuffle,
+					skillO: skillO,
+					skillOEngineAIML: skillOEngineAIML,
+					skillOShuffle: skillOShuffle,
+					skillX: skillX,
+					skillXEngineAIML: skillXEngineAIML,
+					skillXShuffle: skillXShuffle,
 					threadId: i,
 				});
 				worker.onmessage = (event: MessageEvent) => {
