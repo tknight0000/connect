@@ -63,7 +63,15 @@ let dimensions: Dimensions = {
 	workingData: WorkingData = {
 		placementsAvailableByPositionHash: {},
 		placementsByPositionHash: {}, // true is O
-		positionHashesByValues: {},
+		positionHashesByValues: {
+			data: {
+				o: {},
+				sum: {},
+				x: {},
+			},
+			max: 0,
+			min: 0,
+		},
 		values: {
 			valuesByPositionHash: {},
 			valuesOMax: 0,

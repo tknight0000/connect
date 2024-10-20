@@ -779,7 +779,7 @@ class Connect {
 		}
 	}
 
-	private gameOver(oWon: boolean, winningPostionHashes: number[]): void {
+	private gameOver(historyByPositionHash: number[], oWon: boolean, winningPostionHashes: number[]): void {
 		let t = this,
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash;
 

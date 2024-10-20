@@ -53,8 +53,18 @@ export enum TraversalType {
 export type WorkingData = {
 	placementsAvailableByPositionHash: { [key: number]: null };
 	placementsByPositionHash: { [key: number]: boolean }; // true is O
-	positionHashesByValues: { [key: number]: number[] };
+	positionHashesByValues: WorkingDataPositionsByValues;
 	values: WorkingDataValues;
+};
+
+export type WorkingDataPositionsByValues = {
+	data: {
+		o: { [key: number]: number[] };
+		sum: { [key: number]: number[] };
+		x: { [key: number]: number[] };
+	};
+	max: number;
+	min: number;
 };
 
 export type WorkingDataValues = {

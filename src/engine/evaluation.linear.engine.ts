@@ -11,6 +11,7 @@ import {
 	TraversalSetAndChains,
 	TraversalType,
 	WorkingData,
+	WorkingDataPositionsByValues,
 } from './types.engine';
 
 export class EvaluationLinearEngine {
@@ -23,7 +24,22 @@ export class EvaluationLinearEngine {
 		workingData: WorkingData,
 		algorithmType: AlgorithmType | undefined = undefined,
 	): void {
-		let values: { o: number; x: number },
+		let positionHashesByValues: WorkingDataPositionsByValues = {
+				data: {
+					o: {},
+					sum: {},
+					x: {},
+				},
+				max: 0,
+				min: 0,
+			},
+			dataO: { [key: number]: number[] } = positionHashesByValues.data.o,
+			dataSum: { [key: number]: number[] } = positionHashesByValues.data.sum,
+			dataX: { [key: number]: number[] } = positionHashesByValues.data.x,
+			values: { o: number; x: number },
+			valueSum: number,
+			valuesMax: number = 0,
+			valuesMin: number = Infinity,
 			valuesByPositionHash: { [key: number]: { o: number; x: number } } = workingData.values.valuesByPositionHash;
 
 		// Reset current values
@@ -35,6 +51,40 @@ export class EvaluationLinearEngine {
 
 		// Eval
 		EvaluationLinearEngine._calc(dimensions, masterSet, workingData, algorithmType);
+
+		// Map positionsHashes by value
+		for (let [positionHash, values] of Object.entries(valuesByPositionHash)) {
+			valueSum = values.o + values.x;
+			if (valueSum) {
+				// Don't register valueless positions
+				if (!dataO[values.o]) {
+					dataO[values.o] = [Number(positionHash)];
+				} else {
+					dataO[values.o].push(Number(positionHash));
+				}
+				if (!dataSum[valueSum]) {
+					dataSum[valueSum] = [Number(positionHash)];
+				} else {
+					dataSum[valueSum].push(Number(positionHash));
+				}
+				if (!dataX[values.x]) {
+					dataX[values.x] = [Number(positionHash)];
+				} else {
+					dataX[values.x].push(Number(positionHash));
+				}
+
+				if (valueSum > valuesMax) {
+					valuesMax = valueSum;
+				}
+				if (valueSum < valuesMin) {
+					valuesMin = valueSum;
+				}
+			}
+		}
+
+		positionHashesByValues.max = valuesMax;
+		positionHashesByValues.min = valuesMin;
+		workingData.positionHashesByValues = positionHashesByValues;
 	}
 
 	private static _calc(

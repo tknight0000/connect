@@ -1,5 +1,5 @@
 /**
- * Skill is between and including 1 and 5
+ * Skill refers to the percentage away from perfect a computer is allowed to play
  *
  * @author tknight-dev
  */
@@ -7,19 +7,51 @@
 import { Dimensions, WorkingData } from './types.engine';
 
 export class SkillEngine {
+	private static skillMax: number = 5;
+	private static skillMin: number = 1;
+
 	/**
 	 * @return is positionHash
 	 */
-	public static calc(skill: number, workingData: WorkingData): number {
-		if (skill > 1) {
-			// Place randomly: https://jsperf.com/random-object-property-selection
-			let keys: string[] = Object.keys(workingData.placementsAvailableByPositionHash);
-			return Number(keys[(keys.length * Math.random()) << 0]);
+	public static calc(skill: number, turnO: boolean, workingData: WorkingData): number {
+		let minViableValue: number,
+			positionHashesByValues: {
+				o: { [key: number]: number[] };
+				sum: { [key: number]: number[] };
+				x: { [key: number]: number[] };
+			} = workingData.positionHashesByValues.data,
+			positionHashesByValuesMax: number = workingData.positionHashesByValues.max,
+			positionHashesByValuesMin: number = workingData.positionHashesByValues.min,
+			positionHash: number,
+			positions: number[],
+			valueOMax: number = workingData.values.valuesOMax,
+			values: number[],
+			valueXMax: number = workingData.values.valuesXMax;
+
+		if (skill === SkillEngine.skillMax) {
+			if (valueOMax > valueXMax) {
+				positions = positionHashesByValues.o[valueOMax];
+			} else if (valueXMax > valueOMax) {
+				positions = positionHashesByValues.x[valueXMax];
+			} else {
+				positions = positionHashesByValues.sum[positionHashesByValuesMax];
+			}
+		} else if (skill !== SkillEngine.skillMin) {
+			minViableValue = SkillEngine.scale(skill, SkillEngine.skillMax, SkillEngine.skillMin, positionHashesByValuesMax, positionHashesByValuesMin);
+
+			// Array of positionValues that meet the min value determined by skill
+			values = Object.keys(positionHashesByValues.sum)
+				.map((v) => Number(v))
+				.filter((v) => v >= minViableValue);
+
+			// Randomly select from values array to get positionHash[] corresponding to randomized value
+			positions = positionHashesByValues.sum[values[(values.length * Math.random()) << 0]];
 		} else {
-			// Place randomly: https://jsperf.com/random-object-property-selection
-			let keys: string[] = Object.keys(workingData.placementsAvailableByPositionHash);
-			return Number(keys[(keys.length * Math.random()) << 0]);
+			positions = Object.keys(workingData.placementsAvailableByPositionHash).map((v) => Number(v));
 		}
+
+		// Place randomly: https://jsperf.com/random-object-property-selection
+		return positions[(positions.length * Math.random()) << 0];
 	}
 
 	/**
@@ -30,7 +62,7 @@ export class SkillEngine {
 			aMax = dimensions.aMax,
 			bMax = dimensions.bMax;
 
-		if (skill > 1) {
+		if (skill !== SkillEngine.skillMin) {
 			let a: number,
 				aPossible: number[] = [],
 				b: number,
@@ -54,7 +86,12 @@ export class SkillEngine {
 
 			return ((a & 0xff) << 8) | (b & 0xff);
 		} else {
-			return SkillEngine.calc(1, workingData);
+			return SkillEngine.calc(SkillEngine.skillMin, false, workingData);
 		}
+	}
+
+	public static scale(input: number, inputMax: number, inputMin: number, outputMax: number, outputMin: number, round: boolean = false): number {
+		let value: number = ((input - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
+		return round ? Math.round(value) : value;
 	}
 }

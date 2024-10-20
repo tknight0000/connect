@@ -9,10 +9,12 @@ export { WorkingDataValues } from './types.engine'; // Make available under this
 import { Dimensions, MasterTraversalSetAndChains, WorkingData, WorkingDataValues } from './types.engine';
 
 export class GameEngine {
-	private callbackGameOver: ((oWon: boolean, winningPostionHashes: number[]) => void) | undefined;
+	private bypassSkill: boolean = false;
+	private callbackGameOver: ((historyByPositionHash: number[], oWon: boolean, winningPostionHashes: number[]) => void) | undefined;
 	private callbackPlace: ((positionHash: number) => void) | undefined;
 	private dimensions: Dimensions;
 	private gameOver: boolean = false;
+	private historyByPositionHash: number[] = [];
 	private human: boolean = false; // human implies X piece
 	private humanWon: boolean = false; // human implies X piece
 	private initialized: boolean = false;
@@ -27,7 +29,7 @@ export class GameEngine {
 	 *
 	 * @return boolean is gameover when false
 	 */
-	private calc(): boolean {
+	private calc(turnO?: boolean): boolean {
 		let t = this,
 			masterSet: MasterTraversalSetAndChains;
 
@@ -36,8 +38,17 @@ export class GameEngine {
 		if (masterSet.winning) {
 			t.gameOver = true;
 
+			if (turnO) {
+				if (t.callbackPlace) {
+					// The computer played this position
+					t.callbackPlace(t.historyByPositionHash[t.historyByPositionHash.length - 1]);
+				} else {
+					console.error('GameEngine > place: no placement callback set');
+				}
+			}
+
 			if (t.callbackGameOver) {
-				t.callbackGameOver(<boolean>masterSet.winningO, <number[]>masterSet.winningPositionHashes);
+				t.callbackGameOver(t.historyByPositionHash, <boolean>masterSet.winningO, <number[]>masterSet.winningPositionHashes);
 			} else {
 				console.error('GameEngine > place: no game over callback set');
 			}
@@ -93,7 +104,6 @@ export class GameEngine {
 			bMaxEff: number = t.dimensions.bMax + 1,
 			positionHash: number,
 			placementsAvailableByPositionHash: { [key: number]: null } = [],
-			positionHashesByValues: { [key: number]: number[] } = {},
 			valuesByPositionHash: { [key: number]: { o: number; x: number } } = {};
 
 		if (!t.initialized) {
@@ -101,25 +111,30 @@ export class GameEngine {
 			return;
 		}
 
-		positionHashesByValues = <any>new Object();
-		positionHashesByValues[0] = [];
-
 		// Initialize map values to 0
 		for (let A = 0; A < aMaxEff; A++) {
 			for (B = 0; B < bMaxEff; B++) {
 				positionHash = ((A & 0xff) << 8) | (B & 0xff);
 
 				placementsAvailableByPositionHash[positionHash] = null;
-				positionHashesByValues[0].push(positionHash);
 				valuesByPositionHash[positionHash] = { o: 0, x: 0 };
 			}
 		}
 
 		t.gameOver = false;
+		t.historyByPositionHash = new Array();
 		t.workingData = {
 			placementsAvailableByPositionHash: placementsAvailableByPositionHash,
 			placementsByPositionHash: {},
-			positionHashesByValues: positionHashesByValues,
+			positionHashesByValues: {
+				data: {
+					o: {},
+					sum: {},
+					x: {},
+				},
+				max: 0,
+				min: 0,
+			},
 			values: {
 				valuesByPositionHash: valuesByPositionHash,
 				valuesOMax: 0,
@@ -153,20 +168,25 @@ export class GameEngine {
 		}
 
 		// Update board (working data) - Human Placement
+		t.historyByPositionHash.push(positionHash);
 		delete t.workingData.placementsAvailableByPositionHash[positionHash];
 		t.workingData.placementsByPositionHash[positionHash] = false; // false is X (human)
-		if (!t.calc()) {
+		if (!t.calc(false)) {
 			// GameOver
 			return true;
 		}
 
 		// Update board (working data) - Computer Placement
-		// positionHash = SkillEngine.calc(t.skillO, t.workingData);
-		// delete t.workingData.placementsAvailableByPositionHash[positionHash];
-		delete t.workingData.placementsAvailableByPositionHash[0];
-		// t.workingData.placementsByPositionHash[positionHash] = true; // true is O (computer)
-		t.workingData.placementsByPositionHash[0] = true; // true is O (computer)
-		if (!t.calc()) {
+		if (t.bypassSkill) {
+			// Forces the computer to only play in the top left corner
+			positionHash = 0;
+		} else {
+			positionHash = SkillEngine.calc(t.skillO, true, t.workingData);
+		}
+		t.historyByPositionHash.push(positionHash);
+		delete t.workingData.placementsAvailableByPositionHash[positionHash];
+		t.workingData.placementsByPositionHash[positionHash] = true; // true is O (computer)
+		if (!t.calc(true)) {
 			// GameOver
 			return true;
 		}
@@ -174,8 +194,7 @@ export class GameEngine {
 		// Let system know human placement is expected
 		if (t.callbackPlace) {
 			// The computer played this position
-			t.callbackPlace(0);
-			// t.callbackPlace(positionHash);
+			t.callbackPlace(positionHash);
 		} else {
 			console.error('GameEngine > place: no placement callback set');
 		}
@@ -196,14 +215,18 @@ export class GameEngine {
 
 		// computer place first
 		positionHash = SkillEngine.placeFirst(t.dimensions, skillX, workingData);
+		delete workingData.placementsAvailableByPositionHash[positionHash];
+		workingData.placementsByPositionHash[positionHash] = false; // true is O
+		t.historyByPositionHash.push(positionHash);
 
 		while (t.calc()) {
 			if (turnO) {
-				positionHash = SkillEngine.calc(skillO, workingData);
+				positionHash = SkillEngine.calc(skillO, turnO, workingData);
 			} else {
-				positionHash = SkillEngine.calc(skillX, workingData);
+				positionHash = SkillEngine.calc(skillX, turnO, workingData);
 			}
 
+			t.historyByPositionHash.push(positionHash);
 			delete workingData.placementsAvailableByPositionHash[positionHash];
 			workingData.placementsByPositionHash[positionHash] = turnO; // true is O
 
@@ -211,10 +234,7 @@ export class GameEngine {
 		}
 	}
 
-	public static scale(input: number, inputMax: number, inputMin: number, outputMax: number, outputMin: number, round: boolean = false): number {
-		let value: number = ((input - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
-		return round ? Math.round(value) : value;
-	}
+	public static scale = SkillEngine.scale;
 
 	public getValues(): WorkingDataValues | null {
 		if (!this.initialized) {
@@ -227,7 +247,7 @@ export class GameEngine {
 	/**
 	 * @param callbackGameOver - called when the game has ended
 	 */
-	public setCallbackGameOver(callbackGameOver: (oWon: boolean, winningPostionHashes: number[]) => void): void {
+	public setCallbackGameOver(callbackGameOver: (historyByPositionHash: number[], oWon: boolean, winningPostionHashes: number[]) => void): void {
 		this.callbackGameOver = callbackGameOver;
 	}
 

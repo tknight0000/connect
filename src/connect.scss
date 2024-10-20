@@ -68,6 +68,7 @@ $connect-header-logo-width: 152px;
 	.gameover {
 		background-color: rgba(0, 0, 0, 0.1);
 		display: none;
+		overflow: hidden;
 		z-index: 3;
 
 		&.animation {
