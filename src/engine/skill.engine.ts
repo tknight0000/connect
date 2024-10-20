@@ -1,5 +1,5 @@
 /**
- * Random selection from array performance: https://jsperf.com/random-object-property-selection
+ * Skill is between and including 1 and 5
  *
  * @author tknight-dev
  */
@@ -7,24 +7,16 @@
 import { Dimensions, WorkingData } from './types.engine';
 
 export class SkillEngine {
-	// // _5 is expert (perfect)
-	// private static _4: number[] = [0, 5, 20, 75];
-	// private static _3: number[] = [25, 45, 25, 5];
-	// private static _2: number[] = [50, 37, 10, 3];
-	// // _1 is noob (random)
-
-	// skill determines what percentage from perfect a placement is allowed to be made
-
 	/**
 	 * @return is positionHash
 	 */
 	public static calc(skill: number, workingData: WorkingData): number {
-		if (skill === 5) {
-			return 0;
-		} else if (skill > 1) {
-			return 0;
+		if (skill > 1) {
+			// Place randomly: https://jsperf.com/random-object-property-selection
+			let keys: string[] = Object.keys(workingData.placementsAvailableByPositionHash);
+			return Number(keys[(keys.length * Math.random()) << 0]);
 		} else {
-			// This skill level is just random placement
+			// Place randomly: https://jsperf.com/random-object-property-selection
 			let keys: string[] = Object.keys(workingData.placementsAvailableByPositionHash);
 			return Number(keys[(keys.length * Math.random()) << 0]);
 		}
@@ -38,7 +30,7 @@ export class SkillEngine {
 			aMax = dimensions.aMax,
 			bMax = dimensions.bMax;
 
-		if (skill !== 1) {
+		if (skill > 1) {
 			let a: number,
 				aPossible: number[] = [],
 				b: number,
@@ -62,9 +54,7 @@ export class SkillEngine {
 
 			return ((a & 0xff) << 8) | (b & 0xff);
 		} else {
-			let keys: string[] = Object.keys(workingData.placementsAvailableByPositionHash);
-			// Place randomly
-			return Number(keys[(keys.length * Math.random()) << 0]);
+			return SkillEngine.calc(1, workingData);
 		}
 	}
 }

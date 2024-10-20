@@ -218,24 +218,24 @@ export class EvaluationLinearEngine {
 						applied = false;
 						if (placement.gapBefore === 1) {
 							if (j !== 0 && chains[j - 1].o === o) {
-								// console.log('A1', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'));
+								// console.log('A1', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
 								adder(set[placement.index - 1], connectSize * 5);
 								applied = true;
 							}
 						} else {
-							// console.log('A2', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'));
+							// console.log('A2', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
 							adder(set[placement.index - 1], connectSize * 5);
 							applied = true;
 						}
 
 						if (placement.gapAfter === 1) {
 							if (j !== chainsLength - 1 && chains[j + 1].o === o) {
-								// console.log('A3', set[placement.index + placementCellsLength], set[placement.index + placementCellsLength].toString(16).padStart(4, '0'));
+								// console.log('A3', set[placement.index + placementCellsLength], set[placement.index + placementCellsLength].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
 								adder(set[placement.index + placementCellsLength], connectSize * 5);
 								applied = true;
 							}
 						} else {
-							// console.log('A4', set[placement.index + placementCellsLength], set[placement.index + placementCellsLength].toString(16).padStart(4, '0'));
+							// console.log('A4', set[placement.index + placementCellsLength], set[placement.index + placementCellsLength].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
 							adder(set[placement.index + placementCellsLength], connectSize * 5);
 							applied = true;
 						}
@@ -249,16 +249,15 @@ export class EvaluationLinearEngine {
 						if (
 							placement.gapBefore === 1 &&
 							placement.gapAfter > 0 &&
-							chains[j - 1].placement.gapBefore > 0 &&
-							placementCellsLength + chains[j - 1].placement.cells.length == connectSize - 3
+							placementCellsLength + chains[j - 1].placement.cells.length >= connectSize - 2
 						) {
-							// console.log('B', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'));
+							// console.log('B', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
 							adder(set[placement.index - 1], connectSize * 5);
 							continue;
 						}
 
 						if (placement.gapBefore === 3 && placementCellsLength >= connectSize - 2 && chains[j - 1].placement.cells.length >= connectSize - 2) {
-							// console.log('C', set[placement.index - 2], set[placement.index - 2].toString(16).padStart(4, '0'));
+							// console.log('C', set[placement.index - 2], set[placement.index - 2].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
 							adder(set[placement.index - 2], connectSize * 5);
 							continue;
 						}

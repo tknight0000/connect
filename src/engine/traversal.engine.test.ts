@@ -1358,9 +1358,10 @@ describe('GameEngine: Traversal', () => {
 
 		// Generate chains
 		masterTraversalSetAndChains = TraversalEngine.masterSet(dimensions, workingData);
+		traversalSetAndChainsGroup = masterTraversalSetAndChains.traversalSetAndChainsGroup;
 		// log('masterTraversalSetAndChains', util.inspect(masterTraversalSetAndChains, {showHidden: false, depth: null, colors: true}));
 
-		traversalSetAndChainsGroup = masterTraversalSetAndChains.traversalSetAndChainsGroup;
+		// Verify postionHahes are valid
 		for (let i in traversalSetAndChainsGroup) {
 			set = traversalSetAndChainsGroup[i].set;
 			// log('set['+i+']', util.inspect(set, {showHidden: false, depth: null, colors: true}));
@@ -1373,6 +1374,21 @@ describe('GameEngine: Traversal', () => {
 				expect((set[j] >> 8) & 0xff).toBeLessThanOrEqual(dimensions.aMax); // A
 				expect(set[j] & 0xff).toBeLessThanOrEqual(dimensions.bMax); // B
 			}
+		}
+
+		// Verify that there are no duplicate sets
+		let setList: { [key: string]: string } = {},
+			setString: string;
+		for (let i in traversalSetAndChainsGroup) {
+			set = traversalSetAndChainsGroup[i].set;
+			setString = JSON.stringify(set);
+
+			if (setList[setString] !== undefined) {
+				// Duplicate
+				expect(`duplicate: ${setString} (${setList[setString]})`).toBe('');
+			}
+
+			setList[setString] = TraversalType[traversalSetAndChainsGroup[i].type];
 		}
 	});
 

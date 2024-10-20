@@ -326,6 +326,14 @@ class Connect {
 					elements = elementBoardGridCellsColorByPositionHash[Number(positionHash)];
 					elements.o.style.opacity = String(opacityO / 100);
 					elements.x.style.opacity = String(opacityX / 100);
+
+					if (evaluation.o === valuesOMax) {
+						elements.o.className = 'color o max';
+						elements.o.style.opacity = '.8';
+					} else if (evaluation.x === valuesXMax) {
+						elements.x.className = 'color x max';
+						elements.x.style.opacity = '.8';
+					}
 				}
 			} else {
 				console.warn('Connect > boardGridPlaced: engines values were null');

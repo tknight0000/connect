@@ -43,7 +43,7 @@ export class TraversalEngine {
 		// Process
 		// console.log('MASTER SET');
 		for (let A = 0; A < aMaxEff; A++) {
-			// console.log('  >> A:', A, A.toString(16));
+			// console.log('  >> A:', A);
 			// console.log('IT-A', A.toString(16).padStart(4, '0'));
 			traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, (A & 0xff) << 8, workingData));
 
@@ -56,7 +56,7 @@ export class TraversalEngine {
 		}
 
 		for (let B = 0; B < bMaxEff; B++) {
-			// console.log('  >> B:', B, B.toString(16));
+			// console.log('  >> B:', B);
 			// console.log('IT-B', B.toString(16).padStart(4, '0'));
 			traversalSetAndChainsGroup.push(TraversalEngine.getByType1H(dimensions, B & 0xff, workingData));
 
@@ -64,7 +64,7 @@ export class TraversalEngine {
 				// console.log('3D-B', Number(B & 0xff).toString(16).padStart(4, '0'));
 				traversalSetAndChainsGroup.push(TraversalEngine.getByType3D(dimensions, B & 0xff, workingData));
 			}
-			if (B > connectSize - 3 && B < bMaxEff) {
+			if (B > connectSize - 3 && B < bMaxEff - 1) {
 				// console.log('4U-B', Number(B & 0xff).toString(16).padStart(4, '0'));
 				traversalSetAndChainsGroup.push(TraversalEngine.getByType4U(dimensions, B & 0xff, workingData));
 			}

@@ -2,6 +2,7 @@
  * @author tknight-dev
  */
 
+const colors = require('colors');
 const util = require('util');
 import { log } from 'console';
 import { EvaluationLinearEngine } from './evaluation.linear.engine';
@@ -19,6 +20,45 @@ let dimensions: Dimensions = {
 		winning: false,
 		winningO: undefined,
 		winningPositionHashes: undefined,
+	},
+	printGameboard: (displayOPieces?: boolean, note?: string) => void = (displayOPieces?: boolean, note?: string) => {
+		let A: number,
+			c: (param: any) => void = displayOPieces ? colors.red : colors.green,
+			placementsByPositionHash: { [key: number]: boolean } = workingData.placementsByPositionHash,
+			string: string = '',
+			value: number,
+			values: { o: number; x: number },
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = workingData.values.valuesByPositionHash;
+
+		for (let B = -1; B <= dimensions.aMax; B++) {
+			for (A = -1; A <= dimensions.bMax; A++) {
+				if (A === -1) {
+					if (B !== -1) {
+						string += 'B' + B + ' ';
+					} else {
+						string += '(' + c(displayOPieces ? 'o' : 'x') + ')';
+					}
+				} else {
+					if (B === -1) {
+						string += '  A' + A + ' ';
+					} else if (placementsByPositionHash[hashTo(A, B)] !== undefined) {
+						string += '[ ' + (placementsByPositionHash[hashTo(A, B)] ? 'O' : 'X') + ' ]';
+					} else {
+						values = valuesByPositionHash[hashTo(A, B)];
+						value = displayOPieces ? values.o : values.x;
+
+						if (value) {
+							string += '[' + c(value.toString().padStart(3, ' ')) + ']';
+						} else {
+							string += '[   ]';
+						}
+					}
+				}
+			}
+			string += '\n';
+		}
+
+		log(expect.getState().currentTestName + '\n' + (note ? '   - ' + note + '\n' : '') + string);
 	},
 	workingData: WorkingData = {
 		placementsAvailableByPositionHash: {},
@@ -65,7 +105,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -103,7 +143,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -143,7 +183,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -196,7 +236,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -206,15 +246,15 @@ describe('GameEngine: Evaluation', () => {
 		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
-		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(dimensions.connectSize * 5);
 		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
-		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
-		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(dimensions.connectSize * 5);
 		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
 		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
@@ -255,7 +295,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -309,7 +349,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -359,7 +399,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -409,7 +449,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -439,6 +479,44 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
+	test('Algorithm: Type3-TwoToWin, Taversal: All', () => {
+		let connectSize: number = dimensions.connectSize,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			masterTraversalSetAndChains: MasterTraversalSetAndChains,
+			values: WorkingDataValues = workingData.values;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(4, 3)] = false;
+		placementsByPositionHash[hashTo(3, 4)] = false;
+		placementsByPositionHash[hashTo(4, 4)] = false;
+		placementsByPositionHash[hashTo(5, 4)] = false;
+		placementsByPositionHash[hashTo(4, 5)] = false;
+		placementsByPositionHash[hashTo(3, 6)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+
+		// Generate chains
+		masterTraversalSetAndChains = TraversalEngine.masterSet(dimensions, workingData);
+		masterSet.traversalSetAndChainsGroup = masterTraversalSetAndChains.traversalSetAndChainsGroup;
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, AlgorithmType.TYPE3_TWOTOWIN);
+		// printGameboard();
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(connectSize * 5);
+
+		expect(values.valuesByPositionHash[hashTo(4, 2)].x).toBe(connectSize * 5);
+		expect(values.valuesByPositionHash[hashTo(6, 3)].x).toBe(connectSize * 5);
+		expect(values.valuesByPositionHash[hashTo(2, 4)].x).toBe(connectSize * 5);
+		expect(values.valuesByPositionHash[hashTo(6, 4)].x).toBe(connectSize * 5);
+		expect(values.valuesByPositionHash[hashTo(4, 6)].x).toBe(connectSize * 5);
+		expect(values.valuesByPositionHash[hashTo(2, 7)].x).toBe(connectSize * 5);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+	});
+
 	test('Algorithm: Type4-SingleGap, Taversal: Type1-H', () => {
 		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_SINGLEGAP,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
@@ -460,7 +538,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -508,7 +586,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -547,7 +625,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -598,7 +676,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -651,7 +729,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);
@@ -704,7 +782,7 @@ describe('GameEngine: Evaluation', () => {
 
 		// Evaluate chains
 		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
-		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+		// printGameboard();
 
 		// Test values
 		expect(values.valuesOMax).toBe(0);

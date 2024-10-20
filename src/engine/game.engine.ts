@@ -128,13 +128,7 @@ export class GameEngine {
 		};
 
 		if (!t.human) {
-			// computer place first
-			positionHash = SkillEngine.placeFirst(t.dimensions, t.skillX, t.workingData);
-
-			// TODO
-			// while(!t.gameOver) {
-			// 	t.calc();
-			// }
+			t.placeAuto();
 		}
 	}
 
@@ -158,7 +152,7 @@ export class GameEngine {
 			return false;
 		}
 
-		// Update board (working data)
+		// Update board (working data) - Human Placement
 		delete t.workingData.placementsAvailableByPositionHash[positionHash];
 		t.workingData.placementsByPositionHash[positionHash] = false; // false is X (human)
 		if (!t.calc()) {
@@ -166,46 +160,55 @@ export class GameEngine {
 			return true;
 		}
 
-		// TODO: finish calc, such that we have actual evaluations
-		// TODO: use skill engine to determine computer's positionHash placement
+		// Update board (working data) - Computer Placement
+		// positionHash = SkillEngine.calc(t.skillO, t.workingData);
 		// delete t.workingData.placementsAvailableByPositionHash[positionHash];
+		delete t.workingData.placementsAvailableByPositionHash[0];
 		// t.workingData.placementsByPositionHash[positionHash] = true; // true is O (computer)
+		t.workingData.placementsByPositionHash[0] = true; // true is O (computer)
+		if (!t.calc()) {
+			// GameOver
+			return true;
+		}
 
-		/**
-		 * Delete me once evaluation and skill system are in place
-		 *
-		 * TMP: START
-		 */
-		// let x: number, o: number;
-		// for (let i in t.workingData.values.valuesByPositionHash) {
-		// 	x = Math.floor(Math.random() * 91);
-		// 	o = Math.floor(Math.random() * 91);
-
-		// 	t.workingData.values.valuesByPositionHash[i].x = x;
-		// 	t.workingData.values.valuesByPositionHash[i].o = o;
-
-		// 	t.workingData.values.valuesO.max = Math.max(t.workingData.values.valuesO.max, o);
-		// 	t.workingData.values.valuesO.min = Math.min(t.workingData.values.valuesO.min, o);
-		// 	t.workingData.values.valuesX.max = Math.max(t.workingData.values.valuesX.max, x);
-		// 	t.workingData.values.valuesX.min = Math.min(t.workingData.values.valuesX.min, x);
-		// }
-
-		let keys: string[] = Object.keys(t.workingData.placementsAvailableByPositionHash);
-		positionHash = Number(keys[(keys.length * Math.random()) << 0]);
-		delete t.workingData.placementsAvailableByPositionHash[positionHash];
-		t.workingData.placementsByPositionHash[positionHash] = true; // true is O (computer)
-		/**
-		 * TMP: STOP
-		 */
-
+		// Let system know human placement is expected
 		if (t.callbackPlace) {
 			// The computer played this position
-			t.callbackPlace(positionHash);
+			t.callbackPlace(0);
+			// t.callbackPlace(positionHash);
 		} else {
 			console.error('GameEngine > place: no placement callback set');
 		}
 
 		return true;
+	}
+
+	/**
+	 * Used one Computer Vs Computer
+	 */
+	private placeAuto(): void {
+		let t = this,
+			positionHash: number,
+			skillO: number = t.skillO,
+			skillX: number = t.skillX,
+			turnO: boolean = true,
+			workingData: WorkingData = t.workingData;
+
+		// computer place first
+		positionHash = SkillEngine.placeFirst(t.dimensions, skillX, workingData);
+
+		while (t.calc()) {
+			if (turnO) {
+				positionHash = SkillEngine.calc(skillO, workingData);
+			} else {
+				positionHash = SkillEngine.calc(skillX, workingData);
+			}
+
+			delete workingData.placementsAvailableByPositionHash[positionHash];
+			workingData.placementsByPositionHash[positionHash] = turnO; // true is O
+
+			turnO = !turnO;
+		}
 	}
 
 	public static scale(input: number, inputMax: number, inputMin: number, outputMax: number, outputMin: number, round: boolean = false): number {
