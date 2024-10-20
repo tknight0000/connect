@@ -202,8 +202,8 @@ class Connect {
 		t.gameEngine.setCallbackGameOver(t.gameOver.bind(this));
 		t.gameEngine.setCallbackPlace(t.boardGridPlaced.bind(this));
 
-		// Initialize gameEngine
-		t.gameEngine.initialize(gameboardSizeA, gameboardSizeB, t.gameConnectSize, t.skill, t.skillEngineAIML);
+		// Initialize gameEngine (-1 from length 10 is array range 0-9 or aMax & bMax)
+		t.gameEngine.initialize(gameboardSizeA - 1, gameboardSizeB - 1, t.gameConnectSize, t.skill, t.skillEngineAIML);
 
 		// Clean gameboard
 		t.elementBoardGridCellsByPositionHash = <any>new Object();

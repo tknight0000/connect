@@ -5,8 +5,9 @@
 export enum AlgorithmType {
 	TYPE1_VIABILITY,
 	TYPE2_ONETOWIN,
-	TYPE3_SINGLEGAP,
-	TYPE4_ECHOS,
+	TYPE3_TWOTOWIN,
+	TYPE4_SINGLEGAP,
+	TYPE5_ECHOS,
 }
 
 export type Dimensions = {

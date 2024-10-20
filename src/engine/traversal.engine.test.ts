@@ -1354,6 +1354,29 @@ describe('GameEngine: Traversal', () => {
 	});
 
 	test('MasterSet', () => {
+		let j: number, masterTraversalSetAndChains: MasterTraversalSetAndChains, set: number[], traversalSetAndChainsGroup: TraversalSetAndChains[];
+
+		// Generate chains
+		masterTraversalSetAndChains = TraversalEngine.masterSet(dimensions, workingData);
+		// log('masterTraversalSetAndChains', util.inspect(masterTraversalSetAndChains, {showHidden: false, depth: null, colors: true}));
+
+		traversalSetAndChainsGroup = masterTraversalSetAndChains.traversalSetAndChainsGroup;
+		for (let i in traversalSetAndChainsGroup) {
+			set = traversalSetAndChainsGroup[i].set;
+			// log('set['+i+']', util.inspect(set, {showHidden: false, depth: null, colors: true}));
+
+			for (j = 0; j < set.length; j++) {
+				// log('  >> ['+j+']:',set[j],set[j].toString(16).padStart(4,'0'),(set[j] >> 8) & 0xff, set[j] & 0xff);
+				expect((set[j] >> 8) & 0xff).toBeGreaterThanOrEqual(0); // A
+				expect(set[j] & 0xff).toBeGreaterThanOrEqual(0); // B
+
+				expect((set[j] >> 8) & 0xff).toBeLessThanOrEqual(dimensions.aMax); // A
+				expect(set[j] & 0xff).toBeLessThanOrEqual(dimensions.bMax); // B
+			}
+		}
+	});
+
+	test('MasterSet (2)', () => {
 		let aMaxEff: number = dimensions.aMax + 1,
 			bMaxEff: number = dimensions.bMax + 1,
 			connectSize: number = dimensions.connectSize,
@@ -1517,7 +1540,7 @@ describe('GameEngine: Traversal', () => {
 		}
 	});
 
-	test('MasterSet Winning Multi Chain', () => {
+	test('MasterSet Winning Multi Chain (Global*)', () => {
 		let aMax: number = 8,
 			bMax: number = 8,
 			aPrevious: number = dimensions.aMax,

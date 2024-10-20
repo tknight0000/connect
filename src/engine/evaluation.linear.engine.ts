@@ -9,6 +9,7 @@ import {
 	TraversalChain,
 	TraversalChainPlacement,
 	TraversalSetAndChains,
+	TraversalType,
 	WorkingData,
 } from './types.engine';
 
@@ -43,10 +44,7 @@ export class EvaluationLinearEngine {
 		algorithmType: AlgorithmType | undefined = undefined,
 	): void {
 		let adder: (positionHash: number, value: number) => void,
-			aMax: number = dimensions.aMax,
-			availAfter: boolean,
-			availBefore: boolean,
-			bMax: number = dimensions.bMax,
+			applied: boolean,
 			chain: TraversalChain,
 			chainEff: TraversalChain,
 			chainPossibleWidth: number,
@@ -69,8 +67,6 @@ export class EvaluationLinearEngine {
 			placementCellsLengthEffValueOffsetAfter: number,
 			placementCellsLengthEffValueOffsetBefore: number,
 			placementEff: TraversalChainPlacement,
-			placementsByPositionHash: { [key: number]: boolean } = workingData.placementsByPositionHash,
-			positionHash: number,
 			set: number[], // positionHash[]
 			traversalSetAndChains: TraversalSetAndChains,
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
@@ -194,8 +190,7 @@ export class EvaluationLinearEngine {
 				/*
 				 * Algorithm: 2 "One to Win"
 				 *
-				 * Adds winning value, if applicable, to first cell open after and before chain as well as gap
-				 * cell between chains leading to a win
+				 * Positions that force a win during this turn (first)
 				 */
 				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE2_ONETOWIN) {
 					if (placementCellsLength === connectSize - 1) {
@@ -214,23 +209,80 @@ export class EvaluationLinearEngine {
 				}
 
 				/*
-				 * Algorithm: 3 "Single Gap"
+				 * Algorithm: 3 "2ToWin"
+				 *
+				 * Positions that force a win by the next turn (second)
+				 */
+				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE3_TWOTOWIN) {
+					if (placement.gapAfter > 0 && placement.gapBefore > 0 && placementCellsLength === connectSize - 2) {
+						applied = false;
+						if (placement.gapBefore === 1) {
+							if (j !== 0 && chains[j - 1].o === o) {
+								// console.log('A1', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'));
+								adder(set[placement.index - 1], connectSize * 5);
+								applied = true;
+							}
+						} else {
+							// console.log('A2', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'));
+							adder(set[placement.index - 1], connectSize * 5);
+							applied = true;
+						}
+
+						if (placement.gapAfter === 1) {
+							if (j !== chainsLength - 1 && chains[j + 1].o === o) {
+								// console.log('A3', set[placement.index + placementCellsLength], set[placement.index + placementCellsLength].toString(16).padStart(4, '0'));
+								adder(set[placement.index + placementCellsLength], connectSize * 5);
+								applied = true;
+							}
+						} else {
+							// console.log('A4', set[placement.index + placementCellsLength], set[placement.index + placementCellsLength].toString(16).padStart(4, '0'));
+							adder(set[placement.index + placementCellsLength], connectSize * 5);
+							applied = true;
+						}
+
+						if (applied) {
+							continue;
+						}
+					}
+
+					if (j !== 0 && chains[j - 1].o === o) {
+						if (
+							placement.gapBefore === 1 &&
+							placement.gapAfter > 0 &&
+							chains[j - 1].placement.gapBefore > 0 &&
+							placementCellsLength + chains[j - 1].placement.cells.length == connectSize - 3
+						) {
+							// console.log('B', set[placement.index - 1], set[placement.index - 1].toString(16).padStart(4, '0'));
+							adder(set[placement.index - 1], connectSize * 5);
+							continue;
+						}
+
+						if (placement.gapBefore === 3 && placementCellsLength >= connectSize - 2 && chains[j - 1].placement.cells.length >= connectSize - 2) {
+							// console.log('C', set[placement.index - 2], set[placement.index - 2].toString(16).padStart(4, '0'));
+							adder(set[placement.index - 2], connectSize * 5);
+							continue;
+						}
+					}
+				}
+
+				/*
+				 * Algorithm: 4 "Single Gap"
 				 *
 				 * Add a value to single gapped cell
 				 */
-				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE3_SINGLEGAP) {
+				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE4_SINGLEGAP) {
 					if (j !== 0 && placement.gapBefore === 1 && chains[j - 1].o === o) {
 						adder(set[index - 1], 1);
 					}
 				}
 
 				/*
-				 * Algorithm: 4 "Echos"
+				 * Algorithm: 5 "Echos"
 				 *
 				 * Add values, reducing from origin to destination, to neighboring cells. "Spaced" chains
 				 * should inflate added values by one without increasing the number of neighbors effected.
 				 */
-				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE4_ECHOS) {
+				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE5_ECHOS) {
 					placementCellsLengthEffValueOffsetAfter = 0;
 					placementCellsLengthEffValueOffsetBefore = 0;
 
@@ -257,6 +309,14 @@ export class EvaluationLinearEngine {
 					indexEff = placement.index + placementCellsLength;
 					placementCellsLengthEff = placementCellsLength;
 					while (placementCellsLengthEff && gapEff) {
+						// if(((set[indexEff] >> 8) & 0xff) < 0 ||
+						// 	((set[indexEff] >> 8) & 0xff) > dimensions.aMax ||
+						// 	(set[indexEff] & 0xff) < 0 ||
+						// 	(set[indexEff] & 0xff) > dimensions.bMax) {
+						// 	console.error('OUT OF RANGE 1', set[indexEff].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
+						// 	console.error('  >> set', traversalSetAndChains.set.map(v => v.toString(16).padStart(4,'0')));
+						// }
+						// console.log('A', set[indexEff], set[indexEff].toString(16).padStart(4, '0'), placementCellsLengthEff, placementCellsLengthEffValueOffsetAfter);
 						adder(set[indexEff], placementCellsLengthEff + placementCellsLengthEffValueOffsetAfter);
 
 						gapEff--;
@@ -269,6 +329,14 @@ export class EvaluationLinearEngine {
 					gapEff = placement.gapBefore;
 					placementCellsLengthEff = placementCellsLength;
 					while (placementCellsLengthEff && gapEff) {
+						// if(((set[indexEff] >> 8) & 0xff) < 0 ||
+						// 	((set[indexEff] >> 8) & 0xff) > dimensions.aMax ||
+						// 	(set[indexEff] & 0xff) < 0 ||
+						// 	(set[indexEff] & 0xff) > dimensions.bMax) {
+						// 	console.error('OUT OF RANGE 2', set[indexEff].toString(16).padStart(4, '0'), TraversalType[traversalSetAndChains.type]);
+						// 	console.error('  >> set', traversalSetAndChains.set.map(v => v.toString(16).padStart(4,'0')));
+						// }
+						// console.log('B', set[indexEff], set[indexEff].toString(16).padStart(4, '0'), placementCellsLengthEff, placementCellsLengthEffValueOffsetBefore);
 						adder(set[indexEff], placementCellsLengthEff + placementCellsLengthEffValueOffsetBefore);
 
 						indexEff--;
@@ -276,13 +344,6 @@ export class EvaluationLinearEngine {
 						placementCellsLengthEff--;
 					}
 				}
-
-				/*
-				 * Algorithm: 5 "2ToWin"
-				 *
-				 * Positions that force a win by the next turn
-				 */
-				// TODO
 			}
 		}
 

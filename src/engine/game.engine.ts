@@ -88,8 +88,9 @@ export class GameEngine {
 
 	public reset(): void {
 		let t = this,
-			aMax: number = t.dimensions.aMax,
-			bMax: number = t.dimensions.bMax,
+			aMaxEff: number = t.dimensions.aMax + 1,
+			B: number,
+			bMaxEff: number = t.dimensions.bMax + 1,
 			positionHash: number,
 			placementsAvailableByPositionHash: { [key: number]: null } = [],
 			positionHashesByValues: { [key: number]: number[] } = {},
@@ -104,9 +105,9 @@ export class GameEngine {
 		positionHashesByValues[0] = [];
 
 		// Initialize map values to 0
-		for (let a = 0; a < aMax; a++) {
-			for (let b = 0; b < bMax; b++) {
-				positionHash = ((a & 0xff) << 8) | (b & 0xff);
+		for (let A = 0; A < aMaxEff; A++) {
+			for (B = 0; B < bMaxEff; B++) {
+				positionHash = ((A & 0xff) << 8) | (B & 0xff);
 
 				placementsAvailableByPositionHash[positionHash] = null;
 				positionHashesByValues[0].push(positionHash);

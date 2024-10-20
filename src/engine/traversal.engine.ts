@@ -41,8 +41,10 @@ export class TraversalEngine {
 		traversalSetAndChainsGroup = masterTraversalSetAndChains.traversalSetAndChainsGroup;
 
 		// Process
+		// console.log('MASTER SET');
 		for (let A = 0; A < aMaxEff; A++) {
-			// console.log('IT-A', Number((A & 0xff) << 8).toString(16).padStart(4, '0'));
+			// console.log('  >> A:', A, A.toString(16));
+			// console.log('IT-A', A.toString(16).padStart(4, '0'));
 			traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, (A & 0xff) << 8, workingData));
 
 			if (A < aMaxEff - (connectSize - 2)) {
@@ -54,7 +56,8 @@ export class TraversalEngine {
 		}
 
 		for (let B = 0; B < bMaxEff; B++) {
-			// console.log('IT-B', Number(B & 0xff).toString(16).padStart(4, '0'));
+			// console.log('  >> B:', B, B.toString(16));
+			// console.log('IT-B', B.toString(16).padStart(4, '0'));
 			traversalSetAndChainsGroup.push(TraversalEngine.getByType1H(dimensions, B & 0xff, workingData));
 
 			if (B > 0 && B < bMaxEff - (connectSize - 2)) {

@@ -123,8 +123,324 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
-	test('Algorithm: Type3-SingleGap, Taversal: Type1-H', () => {
-		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_SINGLEGAP,
+	test('Algorithm: Type3-TwoToWin, Taversal: Type2-V', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_TWOTOWIN,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
+			values: WorkingDataValues = workingData.values,
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(0, 3)] = false;
+		placementsByPositionHash[hashTo(0, 4)] = false;
+		placementsByPositionHash[hashTo(0, 5)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, hashTo(0, 0), workingData));
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChainsGroup[0], {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
+		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 0)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 0)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].x).toBe(0);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+	});
+
+	test('Algorithm: Type3-TwoToWin, Taversal: Type2-V (2)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_TWOTOWIN,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
+			values: WorkingDataValues = workingData.values,
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(0, 0)] = false;
+		placementsByPositionHash[hashTo(0, 1)] = false;
+		placementsByPositionHash[hashTo(0, 3)] = false;
+		placementsByPositionHash[hashTo(0, 5)] = false;
+		placementsByPositionHash[hashTo(0, 7)] = false;
+		placementsByPositionHash[hashTo(0, 8)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, hashTo(0, 0), workingData));
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChainsGroup[0], {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
+		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 0)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 0)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].x).toBe(0);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+	});
+
+	test('Algorithm: Type3-TwoToWin, Taversal: Type2-V (3 [Global*])', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_TWOTOWIN,
+			aMaxPrevious: number = dimensions.aMax,
+			bMaxPrevious: number = dimensions.bMax,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
+			values: WorkingDataValues = workingData.values,
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash;
+
+		// Alter globals
+		dimensions.aMax = 8;
+		dimensions.bMax = 8;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(0, 0)] = false;
+		placementsByPositionHash[hashTo(0, 1)] = false;
+		placementsByPositionHash[hashTo(0, 2)] = false;
+		placementsByPositionHash[hashTo(0, 6)] = false;
+		placementsByPositionHash[hashTo(0, 7)] = false;
+		placementsByPositionHash[hashTo(0, 8)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, hashTo(0, 0), workingData));
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChainsGroup[0], {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
+		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 0)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 0)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].x).toBe(0);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+
+		// Restore globals
+		dimensions.aMax = aMaxPrevious;
+		dimensions.bMax = bMaxPrevious;
+	});
+
+	test('Algorithm: Type3-TwoToWin, Taversal: Type2-V (4)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_TWOTOWIN,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
+			values: WorkingDataValues = workingData.values,
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(0, 1)] = false;
+		placementsByPositionHash[hashTo(0, 2)] = false;
+		placementsByPositionHash[hashTo(0, 3)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, hashTo(0, 0), workingData));
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChainsGroup[0], {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
+		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 0)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 0)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].x).toBe(0);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+	});
+
+	test('Algorithm: Type3-TwoToWin, Taversal: Type2-V (5)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_TWOTOWIN,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
+			values: WorkingDataValues = workingData.values,
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(0, 1)] = false;
+		placementsByPositionHash[hashTo(0, 2)] = false;
+		placementsByPositionHash[hashTo(0, 3)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, hashTo(0, 0), workingData));
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChainsGroup[0], {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
+		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 0)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 0)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].x).toBe(0);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+	});
+
+	test('Algorithm: Type3-TwoToWin, Taversal: Type2-V (6)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE3_TWOTOWIN,
+			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
+			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
+			values: WorkingDataValues = workingData.values,
+			valuesByPositionHash: { [key: number]: { o: number; x: number } } = values.valuesByPositionHash;
+
+		// Prepare placements
+		placementsByPositionHash[hashTo(0, 6)] = false;
+		placementsByPositionHash[hashTo(0, 7)] = false;
+		placementsByPositionHash[hashTo(0, 8)] = false;
+		workingData.placementsByPositionHash = placementsByPositionHash;
+		// log('placementsByPositionHash', util.inspect(placementsByPositionHash, {showHidden: false, depth: null, colors: true}));
+
+		// Generate chains
+		traversalSetAndChainsGroup.push(TraversalEngine.getByType2V(dimensions, hashTo(0, 0), workingData));
+		// log('traversalSetAndChains', util.inspect(traversalSetAndChainsGroup[0], {showHidden: false, depth: null, colors: true}));
+
+		// Evaluate chains
+		EvaluationLinearEngine.calc(dimensions, masterSet, workingData, algorithmType);
+		// log('values', util.inspect(values, {showHidden: false, depth: null, colors: true}));
+
+		// Test values
+		expect(values.valuesOMax).toBe(0);
+		expect(values.valuesXMax).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 0)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 0)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 1)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 2)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 3)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 4)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 5)].x).toBe(dimensions.connectSize * 5);
+		expect(valuesByPositionHash[hashTo(0, 6)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 6)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 7)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 8)].x).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].o).toBe(0);
+		expect(valuesByPositionHash[hashTo(0, 9)].x).toBe(0);
+
+		// Cleanup
+		masterSet.traversalSetAndChainsGroup = new Array();
+	});
+
+	test('Algorithm: Type4-SingleGap, Taversal: Type1-H', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_SINGLEGAP,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
 			values: WorkingDataValues = workingData.values,
@@ -174,8 +490,8 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
-	test('Algorithm: Type4-Echo, Taversal: Type2-V', () => {
-		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_ECHOS,
+	test('Algorithm: Type5-Echos, Taversal: Type2-V', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE5_ECHOS,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
 			values: WorkingDataValues = workingData.values,
@@ -210,8 +526,8 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
-	test('Algorithm: Type4-Echo, Taversal: Type1-H (2)', () => {
-		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_ECHOS,
+	test('Algorithm: Type5-Echos, Taversal: Type2-V (2)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE5_ECHOS,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
 			values: WorkingDataValues = workingData.values,
@@ -261,8 +577,8 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
-	test('Algorithm: Type4-Echo, Taversal: Type1-H (3)', () => {
-		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_ECHOS,
+	test('Algorithm: Type5-Echos, Taversal: Type2-V (3)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE5_ECHOS,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
 			values: WorkingDataValues = workingData.values,
@@ -312,8 +628,8 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
-	test('Algorithm: Type4-Echo, Taversal: Type1-H (4)', () => {
-		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_ECHOS,
+	test('Algorithm: Type5-Echos, Taversal: Type2-V (4)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE5_ECHOS,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
 			values: WorkingDataValues = workingData.values,
@@ -365,8 +681,8 @@ describe('GameEngine: Evaluation', () => {
 		masterSet.traversalSetAndChainsGroup = new Array();
 	});
 
-	test('Algorithm: Type4-Echo, Taversal: Type1-H (5)', () => {
-		let algorithmType: AlgorithmType = AlgorithmType.TYPE4_ECHOS,
+	test('Algorithm: Type5-Echos, Taversal: Type2-V (5)', () => {
+		let algorithmType: AlgorithmType = AlgorithmType.TYPE5_ECHOS,
 			placementsByPositionHash: { [key: number]: boolean } = {}, // true is O
 			traversalSetAndChainsGroup: TraversalSetAndChains[] = masterSet.traversalSetAndChainsGroup,
 			values: WorkingDataValues = workingData.values,
