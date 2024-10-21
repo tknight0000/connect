@@ -1,3 +1,7 @@
+# 1.1.0
+
+-	Added links to developer website. Allows people to play the hosted game there.
+
 # 1.0.0
 
 ### Engine
