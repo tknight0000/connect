@@ -3,7 +3,7 @@
   "description": "A connect 5 like game that supports customizable boards and connection sizes. It also can generate game play databases for AI/ML training.",
   "license": "MIT",
   "name": "connect",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "scripts": {
     "dev": "rimraf dist && npm run tsc && npm run favicon-dev && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve-dev\" \"npm run tsc-dev\" \"npm run webpack-dev\" -n HTML,SCSS,HTTP,TS,WEBP --pad-prefix",
     "favicon": "copyfiles favicon.ico dist/working",

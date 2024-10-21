@@ -30,7 +30,7 @@ Output files from the build processes are stored in the `dist` directory
 ## Dev
 -	`npm run dev` to watch for code changes and live-reload browser if changed
 -	`npm run test-dev` to watch for code changes and re-run unit tests [Jest](https://jestjs.io) if changed
-	-	Leverage the `printGameboard(displayOPieces?: boolean, note?: string)` to visualize the evaluations in the command line
+	-	Leverage the `printGameboard(displayOPieces?: boolean, note?: string)` function to visualize the evaluations in the command line
 		-	```
 			*title-here*
 			   - *note-here*
