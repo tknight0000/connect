@@ -196,7 +196,7 @@ class Connect {
 		if (window.innerWidth < window.innerHeight) {
 			console.log('vertical mode activated');
 			t.gameboardSizeA = 5;
-			t.gameConnectSize = 3;
+			t.gameConnectSize = 4;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
 		}
 
