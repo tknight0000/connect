@@ -1,6 +1,6 @@
 # How To Play
 
--	[Click-Here](https://tknight.dev/#/creations/connect) to play now, or you can build the game yourself.
+-	[Click-Here](https://tknight.dev/#/creations) to play now, or you can build the game yourself.
 	-	Start clicking on the gameboard!
 }
 -	To modify game settings just click `Settings`

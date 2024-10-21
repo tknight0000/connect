@@ -161,6 +161,9 @@ class Connect {
 			t.dbDownload();
 			return false;
 		};
+		t.elementMenuInfo.onclick = () => {
+			(<any>window).open('https://tknight.dev/#/creations', '_blank').focus();
+		};
 		t.elementMenuReset.onclick = () => {
 			t.gameOverDisplay(false, null);
 			t.boardGridBuild();
