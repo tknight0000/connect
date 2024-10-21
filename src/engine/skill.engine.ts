@@ -34,7 +34,6 @@ export class SkillEngine {
 			} else if (valueXMax > valueOMax) {
 				positions = positionHashesByValues.x[valueXMax];
 			} else {
-				// Undefined
 				positions = positionHashesByValues.sum[positionHashesByValuesMax];
 			}
 		} else if (skill !== SkillEngine.skillMin) {
@@ -48,8 +47,6 @@ export class SkillEngine {
 			// Randomly select from values array to get positionHash[] corresponding to randomized value
 			let rand: any = values[(values.length * Math.random()) << 0];
 			positions = positionHashesByValues.sum[rand];
-
-			// Undefined
 		} else {
 			positions = Object.keys(workingData.placementsAvailableByPositionHash).map((v) => Number(v));
 		}
