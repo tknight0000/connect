@@ -1,7 +1,8 @@
 # How To Play
 
--	Open the `connect.html` file from a website using your web browser. To run the app locally see the `Build` section.
+-	[Click-Here](https://tknight.dev/#/creations/connect) to play now, or you can build the game yourself.
 	-	Start clicking on the gameboard!
+}
 -	To modify game settings just click `Settings`
 	-	Skill is ranged between `1` and `5`
 		-	`1` is random placement
@@ -11,50 +12,23 @@
 			-	`4` is `25%` deviation
 		-	`5` is best placement or `0%` deviation
 
+# Evaluation Colors
+
+-	Evaluations colors can be enabled (default) or disabled via the `Settings` screen
+-	The visible the color the more valuable the position
+	-	`Red` indicates is player `O`
+	-	`Green` indicates is player `X`
+	-	Various shades of color mixing between `Red` and `Green` reprents the shared value of that square between players
+
 # Cool Stats
 
-The following statistics were derived from 1,000,000 computer vs computer games at expert difficulty. 
+The following statistics were derived from 1,000,000 computer vs computer games, at expert difficulty, on a 10 by 10 gameboard. 
 
--	Games Drawn: `15.92%`
--	O Wins: `39.84%`
--	X Wins: `60.16%`
+-	Games Drawn: `89.32%`
+-	O Wins: `2.02%`
+-	X Wins: `97.98%`
 
-To provide the statistics above, it took ~6 minutes for 8 threads to individually generate 125,000 games each at an average of 2.94 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own datesets for statistical analysis and AI/ML training!
-
-# Build
-
-### `Node.js` is required to build this app [nodejs.org](https://nodejs.org)
-
-Output files from the build processes are stored in the `dist` directory
-
-## All
--	`npm install` to download the dependencies to your `node_modules` directory
-
-## Dev
--	This is for active coding/development
--	`npm run dev` to watch for code changes and live-reload browser if changed
--	`npm run test-dev` to watch for code changes and re-run unit tests [Jest](https://jestjs.io) if changed
-	-	Leverage the `printGameboard(displayOPieces?: boolean, note?: string)` function to visualize the evaluations in the command line
-		-	```
-			*title-here*
-			   - *note-here*
-			(x)  A0   A1   A2   A3   A4   A5   A6   A7   A8   A9
-			B0 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
-			B1 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
-			B2 [   ][   ][   ][   ][ 25][   ][   ][   ][   ][   ]
-			B3 [   ][   ][   ][   ][ X ][   ][ 25][   ][   ][   ]
-			B4 [   ][   ][ 25][ X ][ X ][ X ][ 25][   ][   ][   ]
-			B5 [   ][   ][   ][   ][ X ][   ][   ][   ][   ][   ]
-			B6 [   ][   ][   ][ X ][ 25][   ][   ][   ][   ][   ]
-			B7 [   ][   ][ 25][   ][   ][   ][   ][   ][   ][   ]
-			B8 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
-			B9 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
-			```
-
-## Prod
--	This builds the final production grade version of the app
--	`npm run prod` to generate the optimized `connect.html` and `*.connect.js`
-	-	Use `npm run serve` to start a web environment to use the built app with all the features
+To provide the statistics above, it took ~18 minutes for 8 threads to individually generate 125,000 games each at ~8.3 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own datesets for statistical analysis and AI/ML training!
 
 # How To Generate AI/ML Datasets For Training
 
@@ -107,3 +81,38 @@ Output files from the build processes are stored in the `dist` directory
 					w: boolean, // true is o winner, false is x winner, and null is drawn game
 				}
 				```
+
+# Build
+
+### `Node.js` is required to build this app [nodejs.org](https://nodejs.org)
+
+Output files from the build processes are stored in the `dist` directory
+
+## All
+-	`npm install` to download the dependencies to your `node_modules` directory
+
+## Dev
+-	This is for active coding/development
+-	`npm run dev` to watch for code changes and live-reload browser if changed
+-	`npm run test-dev` to watch for code changes and re-run unit tests [Jest](https://jestjs.io) if changed
+	-	Leverage the `printGameboard(displayOPieces?: boolean, note?: string)` function to visualize the evaluations in the command line
+		-	```
+			*title-here*
+			   - *note-here*
+			(x)  A0   A1   A2   A3   A4   A5   A6   A7   A8   A9
+			B0 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
+			B1 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
+			B2 [   ][   ][   ][   ][ 25][   ][   ][   ][   ][   ]
+			B3 [   ][   ][   ][   ][ X ][   ][ 25][   ][   ][   ]
+			B4 [   ][   ][ 25][ X ][ X ][ X ][ 25][   ][   ][   ]
+			B5 [   ][   ][   ][   ][ X ][   ][   ][   ][   ][   ]
+			B6 [   ][   ][   ][ X ][ 25][   ][   ][   ][   ][   ]
+			B7 [   ][   ][ 25][   ][   ][   ][   ][   ][   ][   ]
+			B8 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
+			B9 [   ][   ][   ][   ][   ][   ][   ][   ][   ][   ]
+			```
+
+## Prod
+-	This builds the final production grade version of the app
+-	`npm run prod` to generate the optimized `connect.html` and `*.connect.js`
+	-	Use `npm run serve` to start a web environment to play the game with all the features
