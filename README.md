@@ -1,6 +1,6 @@
 # How To Play
 
--	Open the `connect.html` file in your web browser from a website or a local web server
+-	Open the `connect.html` file from a website using your web browser. To run the app locally see the `Build` section.
 	-	Start clicking on the gameboard!
 -	To modify game settings just click `Settings`
 	-	Skill is ranged between `1` and `5`
@@ -13,13 +13,13 @@
 
 # Cool Stats
 
-The following statistics are the average across 1,000,000 computer vs computer games at expert difficulty. 
+The following statistics were derived from 1,000,000 computer vs computer games at expert difficulty. 
 
 -	Games Drawn: `15.92%`
 -	O Wins: `39.84%`
 -	X Wins: `60.16%`
 
-To provide the statistics above, it took ~6 minutes for 8 threads to individually generate 125,000 games each at an average of 2.94 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own statistical databases!
+To provide the statistics above, it took ~6 minutes for 8 threads to individually generate 125,000 games each at an average of 2.94 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own datesets for statistical analysis and AI/ML training!
 
 # Build
 
@@ -27,7 +27,11 @@ To provide the statistics above, it took ~6 minutes for 8 threads to individuall
 
 Output files from the build processes are stored in the `dist` directory
 
+## All
+-	`npm install` to download the dependencies to your `node_modules` directory
+
 ## Dev
+-	This is for active coding/development
 -	`npm run dev` to watch for code changes and live-reload browser if changed
 -	`npm run test-dev` to watch for code changes and re-run unit tests [Jest](https://jestjs.io) if changed
 	-	Leverage the `printGameboard(displayOPieces?: boolean, note?: string)` function to visualize the evaluations in the command line
@@ -48,8 +52,9 @@ Output files from the build processes are stored in the `dist` directory
 			```
 
 ## Prod
+-	This builds the final production grade version of the app
 -	`npm run prod` to generate the optimized `connect.html` and `*.connect.js`
-	-	Use `npm run serve` to start a web environment to use the app locally
+	-	Use `npm run serve` to start a web environment to use the built app with all the features
 
 # How To Generate AI/ML Datasets For Training
 
@@ -102,20 +107,3 @@ Output files from the build processes are stored in the `dist` directory
 					w: boolean, // true is o winner, false is x winner, and null is drawn game
 				}
 				```
-
-# Known Issues
-
--	When building
-	-	https://github.com/remy/inliner/issues/225
-		-	 Comment out the following in `node_modules\inliner\lib\tasks\js.js` (line 18) to avoid library issue
-	```typescript
-	if (type && type.toLowerCase() !== 'text/javascript') {
-		debug('skipping %s', type);
-		return false;
-	}
-	```
-
-## TODO
-
--	Allow copy-and-paste AI/ML functions to be run in the `Gameplay DB Generator` and `Settings`
--	Replace `inliner` dependency
