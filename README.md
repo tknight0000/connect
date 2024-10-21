@@ -1,6 +1,6 @@
 # How To Play
 
--	Open the `connect.html` file in your web browser
+-	Open the `connect.html` file in your web browser from a website or a local web server
 	-	Start clicking on the gameboard!
 -	To modify game settings just click `Settings`
 	-	Skill is ranged between `1` and `5`
@@ -13,13 +13,13 @@
 
 # Cool Stats
 
-The following stats are the average across 1,000,000 computer vs computer games at expert difficulty. 
+The following statistics are the average across 1,000,000 computer vs computer games at expert difficulty. 
 
 -	Games Drawn: `15.92%`
 -	O Wins: `39.84%`
 -	X Wins: `60.16%`
 
-To provide the statistics above, it took ~6 minutes for 8 threads to individually generate 125,000 games each for average of 2.94 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own statistical databases!
+To provide the statistics above, it took ~6 minutes for 8 threads to individually generate 125,000 games each at an average of 2.94 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own statistical databases!
 
 # Build
 
@@ -53,23 +53,23 @@ Output files from the build processes are stored in the `dist` directory
 
 # How To Generate AI/ML Datasets For Training
 
--	Open the `connect.html` file in your web browser
+-	Open the `connect.html` file in your web browser from a website or a local web server
 -	Click on the `DB` link at the top of the page
 -	Change configure the settings for your needs
 -	Click the `Apply` button
--	Wait until thread(s) complete and the data has been processed
--	Click the `Download` button to download the file containing the newly generated DB, in your specified format, to your computer
+-	Wait until threads complete and the data has been processed
+-	Click the `Download` button to download the newly generated DB, in your specified format, to your computer
 
 ## MultiThreaded DB Generation
 
--	In the `Gameplay DB Generator` page, scroll down until you see `Threads`. Increase the number of threads to scale the multithreading capabilities of the generator to your CPUs capabilities.
+-	In the `Gameplay DB Generator` page, scroll down until you see `Threads`. Increase the number of threads to scale the multithreading capabilities of the generator.
 -	MultiThreading is accomplished via JavaScript's [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
 
 # DB Parsing
 
 -	Common to all formats
 	-	`X` always goes first
-	-	Positions are hash into hexadecimal format
+	-	Positions are hashed into hexadecimal format
 		-	EG: Placement `(A2,B3)` is encoded as `0x0203`
 		-	```typescript 
 			// Decode
@@ -80,9 +80,11 @@ Output files from the build processes are stored in the `dist` directory
 			```
 -	CSV
 	-	This format is file size optimized
-	-	Game data example `OX:1,2,3;OX:2,3,4;OX:4,5,6,7,8,9; ...`
-		-	`OX:1,2,3;` the length of the array is 3. 3 is odd, so X won.
-			-	EG: `let winnerX: boolean = Boolean(array.length % 2)`
+	-	Game data example `OX:1,2,3;OX:2,3,4!OX:4,5,6,7,8,9; ...`
+		-	`OX:1,2,3;` the length of the array is 3. 3 is odd, so X won. Unless a `!` appears instead of a `:`.
+			-	```typescript
+				let winnerX: boolean = Boolean(array.length % 2)
+				````
 		-	`OX:...;`
 			-	`O` represents the skill of `O` in a single digit. A value of `0` indicates an AI/ML engine was used.
 			-	`X` represents the skill of `X` in a single digit. A value of `0` indicates an AI/ML engine was used.
@@ -113,7 +115,7 @@ Output files from the build processes are stored in the `dist` directory
 	}
 	```
 
-# TODO
+## TODO
 
 -	Allow copy-and-paste AI/ML functions to be run in the `Gameplay DB Generator` and `Settings`
 -	Replace `inliner` dependency
