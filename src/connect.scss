@@ -188,6 +188,7 @@ $connect-header-logo-width: 152px;
 
 .modal-db,
 .modal-db-progress,
+.modal-decision,
 .modal-settings {
 	display: none;
 
@@ -377,6 +378,27 @@ $connect-header-logo-width: 152px;
 		}
 	}
 }
+
+.modal-decision {
+	position: fixed;
+	z-index: var(--global-z-index-decision-background);
+
+	.background {
+		background-color: rgba(0, 0, 0, 0.5);
+	}
+
+	.foreground {
+		.container {
+			height: 250px;
+			width: 350px;
+
+			.body {
+				height: 190px;
+			}
+		}
+	}
+}
+
 .modal-settings {
 	display: none;
 	z-index: 2;
@@ -404,7 +426,7 @@ $connect-header-logo-width: 152px;
 	right: 0;
 	top: 0;
 	transition: opacity 0.125s linear;
-	z-index: 50;
+	z-index: var(--global-z-index-spinner-background);
 
 	.rotate {
 		animation: rotating 1.5s linear infinite;
@@ -423,7 +445,7 @@ $connect-header-logo-width: 152px;
 
 .version {
 	bottom: 0;
-	color: var(--global-color-gray-66);
+	display: block;
 	font-size: 10px;
 	position: absolute;
 	right: 10px;

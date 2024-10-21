@@ -5,12 +5,14 @@
 import { EvaluationLinearEngine } from './evaluation.linear.engine';
 import { SkillEngine } from './skill.engine';
 import { TraversalEngine } from './traversal.engine';
-export { WorkingDataValues } from './types.engine'; // Make available under this primary module
+export { HistoryReport, HistoryReportInstance, WorkingDataValues } from './types.engine'; // Make available under this primary module
 import { Dimensions, MasterTraversalSetAndChains, WorkingData, WorkingDataValues } from './types.engine';
 
 export class GameEngine {
 	private bypassSkill: boolean = false;
-	private callbackGameOver: ((historyByPositionHash: number[], oWon: boolean, winningPostionHashes: number[]) => void) | undefined;
+	private callbackGameOver:
+		| ((historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | null) => void)
+		| undefined;
 	private callbackPlace: ((positionHash: number) => void) | undefined;
 	private dimensions: Dimensions;
 	private gameOver: boolean = false;
@@ -35,7 +37,17 @@ export class GameEngine {
 
 		masterSet = TraversalEngine.masterSet(t.dimensions, t.workingData);
 
-		if (masterSet.winning) {
+		if (Object.keys(t.workingData.placementsAvailableByPositionHash).length === 0) {
+			t.gameOver = true;
+
+			if (t.callbackGameOver) {
+				t.callbackGameOver(t.historyByPositionHash, null, t.skillO, t.skillX, null);
+			} else {
+				console.error('GameEngine > place: no game over callback set');
+			}
+
+			return false;
+		} else if (masterSet.winning) {
 			t.gameOver = true;
 
 			if (turnO) {
@@ -48,7 +60,7 @@ export class GameEngine {
 			}
 
 			if (t.callbackGameOver) {
-				t.callbackGameOver(t.historyByPositionHash, <boolean>masterSet.winningO, <number[]>masterSet.winningPositionHashes);
+				t.callbackGameOver(t.historyByPositionHash, <boolean>masterSet.winningO, t.skillO, t.skillX, <number[]>masterSet.winningPositionHashes);
 			} else {
 				console.error('GameEngine > place: no game over callback set');
 			}
@@ -245,9 +257,17 @@ export class GameEngine {
 	}
 
 	/**
-	 * @param callbackGameOver - called when the game has ended
+	 * @param callbackGameOver - called when the game has ended. oWon is null on a tie game.
 	 */
-	public setCallbackGameOver(callbackGameOver: (historyByPositionHash: number[], oWon: boolean, winningPostionHashes: number[]) => void): void {
+	public setCallbackGameOver(
+		callbackGameOver: (
+			historyByPositionHash: number[],
+			oWon: boolean | null,
+			skillO: number,
+			skillX: number,
+			winningPostionHashes: number[] | null,
+		) => void,
+	): void {
 		this.callbackGameOver = callbackGameOver;
 	}
 
@@ -256,5 +276,17 @@ export class GameEngine {
 	 */
 	public setCallbackPlace(callbackPlace: (positionHash: number) => void): void {
 		this.callbackPlace = callbackPlace;
+	}
+
+	public static getSkillMax() {
+		return SkillEngine.getSkillMax();
+	}
+
+	public static getSkillMin() {
+		return SkillEngine.getSkillMin();
+	}
+
+	public static getSkillRandom() {
+		return SkillEngine.getSkillRandom();
 	}
 }

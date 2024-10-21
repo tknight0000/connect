@@ -3,6 +3,7 @@
  */
 
 export enum AlgorithmType {
+	TYPE0_EVERYBODY,
 	TYPE1_VIABILITY,
 	TYPE2_ONETOWIN,
 	TYPE3_TWOTOWIN,
@@ -14,6 +15,22 @@ export type Dimensions = {
 	aMax: number;
 	bMax: number;
 	connectSize: number;
+};
+
+export type HistoryReport = {
+	drawsPercentage: number;
+	games: HistoryReportInstance[];
+	skillOEngineAIML: boolean;
+	skillXEngineAIML: boolean;
+	oWinPercentage: number;
+	xWinPercentage: number;
+};
+
+export type HistoryReportInstance = {
+	h: number[]; // if length odd then x won
+	o: number;
+	x: number;
+	w: boolean | null; // true is o won, null is a draw
 };
 
 export type MasterTraversalSetAndChains = {

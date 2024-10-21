@@ -7,8 +7,8 @@
 import { Dimensions, WorkingData } from './types.engine';
 
 export class SkillEngine {
-	private static skillMax: number = 5;
-	private static skillMin: number = 1;
+	private static readonly skillMax: number = 5;
+	private static readonly skillMin: number = 1;
 
 	/**
 	 * @return is positionHash
@@ -34,6 +34,7 @@ export class SkillEngine {
 			} else if (valueXMax > valueOMax) {
 				positions = positionHashesByValues.x[valueXMax];
 			} else {
+				// Undefined
 				positions = positionHashesByValues.sum[positionHashesByValuesMax];
 			}
 		} else if (skill !== SkillEngine.skillMin) {
@@ -45,7 +46,10 @@ export class SkillEngine {
 				.filter((v) => v >= minViableValue);
 
 			// Randomly select from values array to get positionHash[] corresponding to randomized value
-			positions = positionHashesByValues.sum[values[(values.length * Math.random()) << 0]];
+			let rand: any = values[(values.length * Math.random()) << 0];
+			positions = positionHashesByValues.sum[rand];
+
+			// Undefined
 		} else {
 			positions = Object.keys(workingData.placementsAvailableByPositionHash).map((v) => Number(v));
 		}
@@ -93,5 +97,17 @@ export class SkillEngine {
 	public static scale(input: number, inputMax: number, inputMin: number, outputMax: number, outputMin: number, round: boolean = false): number {
 		let value: number = ((input - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
 		return round ? Math.round(value) : value;
+	}
+
+	public static getSkillMax() {
+		return SkillEngine.skillMax;
+	}
+
+	public static getSkillMin() {
+		return SkillEngine.skillMin;
+	}
+
+	public static getSkillRandom() {
+		return Math.floor(Math.random() * SkillEngine.skillMax) + SkillEngine.skillMin;
 	}
 }

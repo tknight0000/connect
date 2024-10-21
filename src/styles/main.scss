@@ -23,10 +23,13 @@ a,
 .hyperlink {
 	color: var(--global-color-gray-bb);
 	cursor: pointer;
+	text-decoration: none;
+	transition: color 0.125s linear;
 
 	&:hover,
 	&.active {
 		color: var(--global-color-font-bright);
+		text-decoration: none;
 	}
 }
 

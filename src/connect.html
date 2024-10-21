@@ -30,7 +30,7 @@
 						<span class="hyperlink menu" id="menu-click">Menu</span>
 						<span class="hyperlink menu-item" id="reset-click" style="visibility: hidden;">Reset</span>
 						<span class="hyperlink menu-item" id="db-click-enable">DB</span>
-						<span class="hyperlink menu-item" id="info-click">Info</span>
+						<span class="hyperlink menu-item" id="info-click" style="visibility: hidden;">Info</span>
 						<span class="hyperlink menu-item" id="settings-click-enable">Settings</span>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 									<tr>
 										<td>Amount</td>
 										<td>
-											<input min=1 max=1000 name="amount" type="number" value=250 />
+											<input min=1 max=1000000 name="amount" type="number" value=10000 />
 										</td>
 									</tr>
 									<tr>
@@ -85,11 +85,11 @@
 										<td class="radio-spread">
 											<span>
 												CSV
-												<input name="format" type="radio" checked />
+												<input name="format" type="radio" />
 											</span>
 											<span>
 												JSON
-												<input name="format" type="radio" />
+												<input name="format" type="radio" checked />
 											</span>
 										</td>
 									</tr>
@@ -162,7 +162,7 @@
 									<tr>
 										<td>Threads</td>
 										<td>
-											<input min=2 max=12 name="threads" type="number" value=4 />
+											<input min=2 max=12 id="dbFormthreads" name="threads" type="number" value=2 />
 										</td>
 									</tr>
 								</table>
@@ -196,6 +196,27 @@
 								<tr>
 									<td class="center width-50"><button id="db-progress-click-cancel">Cancel</button></td>
 									<td class="center width-50"><button id="db-progress-click-download" disabled>Download</button></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-decision modal" id="decision">
+			<div class="background"></div>
+			<div class="foreground">
+				<div class="container" onclick="event.stopPropagation()">
+					<div class="header">
+						Confirm
+					</div>
+					<div class="body">
+						<div class="top" id="descision-message"></div>
+						<div class="bottom">
+							<table>
+								<tr>
+									<td class="center width-50"><button id="descision-yes">Yes</button></td>
+									<td class="center width-50"><button id="descision-no">No</button></td>
 								</tr>
 							</table>
 						</div>
@@ -283,7 +304,7 @@
 		<div class="modal-spinner" id="spinner">
 			<div class="rotate">X</div>
 		</div>
-		<div class="version" id="version"></div>
+		<a class="version" href="https://github.com/tknight0000/connect" id="version"></a>
 		<script src="./connect.js" type="module"></script>
 	</body>
 </html>

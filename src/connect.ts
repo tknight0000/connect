@@ -3,17 +3,22 @@
  */
 
 import { Confetti } from './libs/confetti';
-import { GameEngine, WorkingDataValues } from './engine/game.engine';
+import { GameEngine, HistoryReport, HistoryReportInstance, WorkingDataValues } from './engine/game.engine';
 var globalPackageJSONVersion = require('../../package.json').version;
 
 // App
 class Connect {
 	private confetti: Confetti;
+	private descisionPromiseResolve: any;
 	private elementBoard: HTMLElement;
 	private elementBoardGrid: HTMLElement;
 	private elementBoardGridCellsByPositionHash: { [key: number]: HTMLElement } = {};
 	private elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = {};
 	private elementConnectSize: HTMLElement;
+	private elementDecision: HTMLElement;
+	private elementDecisionMessage: HTMLElement;
+	private elementDecisionNo: HTMLElement;
+	private elementDecisionYes: HTMLElement;
 	private elementDownload: HTMLElement;
 	private elementGameOver: HTMLElement;
 	private elementGameOverCanvas: HTMLCanvasElement;
@@ -35,6 +40,7 @@ class Connect {
 	private elementMenuDBFormSkillOShuffle: HTMLInputElement;
 	private elementMenuDBFormSkillX: HTMLInputElement;
 	private elementMenuDBFormSkillXShuffle: HTMLInputElement;
+	private elementMenuDBFormThreads: HTMLInputElement;
 	private elementMenuDBProgress: HTMLElement;
 	private elementMenuDBProgressContainer: HTMLElement;
 	private elementMenuDBProgressCancel: HTMLInputElement;
@@ -50,18 +56,18 @@ class Connect {
 	private skill: number = 5;
 	private skillEngineAIML: boolean;
 	private spinnerStatus: boolean;
-	private workerData: string[] | {}[]; // csv | {}[json]
 	private workerDataAmax: number;
 	private workerDataAmount: number;
 	private workerDataBmax: number;
 	private workerDataConnectSize: number;
-	private workerDataCSV: boolean;
+	private workerData: string;
+	private workerDataFormatCSV: boolean;
 	private workers: Worker[];
 	private workersElements: {
 		progress: HTMLElement;
 		progressText: HTMLElement;
-		timeEstCompleteInS: HTMLElement;
-		timeTakenAvgInMS: HTMLElement;
+		timingLeft: HTMLElement;
+		timingRight: HTMLElement;
 	}[];
 	private workersRunning: boolean;
 	private workersStats: {
@@ -70,6 +76,8 @@ class Connect {
 		threadId: number;
 		timeTakenTotalInMS: number;
 	}[];
+	private workerProgressUpdateStartedInMs: number;
+	private workerProgressUpdateTimestampInMs: number = new Date().getTime();
 
 	constructor() {
 		let t = this;
@@ -78,6 +86,10 @@ class Connect {
 		t.elementBoard = <HTMLElement>document.getElementById('board');
 		t.elementBoardGrid = <HTMLElement>document.getElementById('grid');
 		t.elementConnectSize = <HTMLElement>document.getElementById('connect-size');
+		t.elementDecision = <HTMLElement>document.getElementById('decision');
+		t.elementDecisionMessage = <HTMLElement>document.getElementById('descision-message');
+		t.elementDecisionNo = <HTMLElement>document.getElementById('descision-no');
+		t.elementDecisionYes = <HTMLElement>document.getElementById('descision-yes');
 		t.elementDownload = <HTMLElement>document.getElementById('download');
 		t.elementGameOver = <HTMLElement>document.getElementById('gameover');
 		t.elementGameOverCanvas = <HTMLCanvasElement>document.getElementById('gameover-canvas');
@@ -92,6 +104,7 @@ class Connect {
 		t.elementMenuDBFormSkillOShuffle = <HTMLInputElement>document.getElementById('dbFormSkillOShuffle');
 		t.elementMenuDBFormSkillX = <HTMLInputElement>document.getElementById('dbFormSkillX');
 		t.elementMenuDBFormSkillXShuffle = <HTMLInputElement>document.getElementById('dbFormSkillXShuffle');
+		t.elementMenuDBFormThreads = <HTMLInputElement>document.getElementById('dbFormthreads');
 		t.elementMenuDBProgress = <HTMLElement>document.getElementById('dbProgress');
 		t.elementMenuDBProgressContainer = <HTMLElement>document.getElementById('dbProgressContainer');
 		t.elementMenuDBProgressCancel = <HTMLInputElement>document.getElementById('db-progress-click-cancel');
@@ -107,6 +120,11 @@ class Connect {
 		t.elementSpinner = <HTMLElement>document.getElementById('spinner');
 		t.elementVersion = <HTMLElement>document.getElementById('version');
 
+		// Default thread count
+		if (navigator.hardwareConcurrency) {
+			t.elementMenuDBFormThreads.value = String(Math.max(navigator.hardwareConcurrency / 4, 2));
+		}
+
 		// Register confetti
 		t.confetti = new Confetti(t.elementGameOverCanvas);
 
@@ -119,6 +137,12 @@ class Connect {
 		};
 
 		// Register onclicks
+		t.elementDecisionNo.onclick = () => {
+			t.descisionClick(false);
+		};
+		t.elementDecisionYes.onclick = () => {
+			t.descisionClick(true);
+		};
 		t.elementMenuDBEnable.onclick = () => {
 			t.dbDisplay(true);
 		};
@@ -392,13 +416,13 @@ class Connect {
 		let t = this,
 			amountEffective: number,
 			amountGenerated: number = 0,
+			dataCSV: string[] = [],
+			dataJSON: HistoryReportInstance[] = [],
 			done: boolean = false,
 			doneCommitted: boolean = false,
-			generateWorker: any,
 			threadsLimit: number = Math.min(threads, amountRequested),
 			timeout: ReturnType<typeof setTimeout>,
 			timeStartInMS: number,
-			timeStopInMS: number,
 			worker: Worker,
 			workers: Worker[] = new Array(threadsLimit),
 			workerStatGen: (threadId: number, amountEffective: number) => void;
@@ -406,15 +430,15 @@ class Connect {
 		if (window.Worker) {
 			amountEffective = Math.ceil(amountRequested / threadsLimit); // Round up to make sure we get enough
 			t.workers = workers;
-			t.workerData = new Array();
 			t.workerDataAmax = aMax;
 			t.workerDataAmount = amountRequested;
 			t.workerDataBmax = bMax;
 			t.workerDataConnectSize = connectSize;
-			t.workerDataCSV = formatCSV;
+			t.workerDataFormatCSV = formatCSV;
 			t.workersRunning = true;
 			t.workersElements = new Array(threadsLimit);
 			t.workersStats = new Array(threadsLimit);
+			t.workerProgressUpdateStartedInMs = new Date().getTime();
 
 			workerStatGen = (threadId: number, amountEffective: number) => {
 				t.workersStats[threadId] = {
@@ -471,7 +495,11 @@ class Connect {
 						} = t.workersStats[event.data.threadId];
 
 						amountGenerated++;
-						t.workerData.push(event.data.data);
+						if (formatCSV) {
+							dataCSV.push(event.data.data);
+						} else {
+							dataJSON.push(event.data.data);
+						}
 
 						// Update stats
 						workerStat.amount = event.data.amount;
@@ -486,20 +514,27 @@ class Connect {
 								if (!doneCommitted) {
 									doneCommitted = true;
 									t.workersRunning = false;
-									timeStopInMS = new Date().getTime() - 1000;
 
-									t.elementMenuDBProgressCancel.innerText = 'Close';
-									t.elementMenuDBProgressDownload.disabled = false;
-									console.log(
-										'workers complete:',
-										t.workerData.length,
-										'records; it took',
-										threadsLimit,
-										'threads a total of',
-										timeStopInMS - timeStartInMS,
-										'ms; format csv =',
-										formatCSV,
-									);
+									// Process and allow download
+									t.spinnerDisplay(true);
+									setTimeout(() => {
+										t.dbProgressDisplayProgressUpdate(true);
+										// Process Data
+										t.dbApplyWebWorkersProcessData(
+											amountGenerated,
+											dataCSV,
+											dataJSON,
+											skillOEngineAIML,
+											skillXEngineAIML,
+											threadsLimit,
+											new Date().getTime() - timeStartInMS,
+										);
+
+										// Update UI
+										t.elementMenuDBProgressCancel.innerText = 'Close';
+										t.elementMenuDBProgressDownload.disabled = false;
+										t.spinnerDisplay(false);
+									});
 								}
 							}, 1000);
 						}
@@ -511,15 +546,15 @@ class Connect {
 		}
 	}
 
-	private dbApplyWebWorkersCancel(confirmed: boolean) {
+	private async dbApplyWebWorkersCancel(confirmed: boolean) {
 		let t = this,
 			workers: Worker[] = t.workers;
 
 		if (!t.workersRunning) {
 			return;
 		} else if (!confirmed) {
-			if (!confirm('Are you sure?')) {
-				console.log('Coonect > dbApplyWebWorkersCancel: cancel aborted');
+			if (!(await t.descisionDisplay('Are you sure?'))) {
+				console.log('Connect > dbApplyWebWorkersCancel: cancel aborted');
 				return;
 			}
 		}
@@ -541,6 +576,54 @@ class Connect {
 				t.dbProgressDisplay(false);
 				t.spinnerDisplay(false);
 			});
+		}
+	}
+
+	private dbApplyWebWorkersProcessData(
+		amount: number,
+		dataCSV: string[],
+		dataJSON: HistoryReportInstance[],
+		skillOEngineAIML: boolean,
+		skillXEngineAIML: boolean,
+		threadCount: number,
+		durationInMs: number,
+	): void {
+		let t = this;
+
+		console.log(
+			`Connect > dbApplyWebWorkersProcessData: Generation Complete! ${threadCount} thread(s) generated ${amount} records in ${durationInMs}ms [format=${t.workerDataFormatCSV ? 'csv' : 'json'}]`,
+		);
+
+		if (t.workerDataFormatCSV) {
+			t.workerData = 'data:text/csv;charset=utf-8,' + dataCSV.join('');
+		} else {
+			let draws: number = 0,
+				historyReport: HistoryReport = {
+					drawsPercentage: 0,
+					games: dataJSON,
+					skillOEngineAIML: skillOEngineAIML,
+					skillXEngineAIML: skillXEngineAIML,
+					oWinPercentage: 0,
+					xWinPercentage: 0,
+				},
+				oWinCount: number = 0;
+
+			dataJSON.forEach((instance: HistoryReportInstance) => {
+				if (instance.w) {
+					oWinCount++;
+				} else if (instance.w === null) {
+					draws++;
+				}
+			});
+			historyReport.drawsPercentage = Math.round((draws / historyReport.games.length) * 10000) / 100;
+			historyReport.oWinPercentage = Math.round((oWinCount / historyReport.games.length) * 10000) / 100;
+			historyReport.xWinPercentage = 100 - historyReport.oWinPercentage;
+
+			t.workerData = 'data:text/csv;charset=utf-8,' + JSON.stringify(historyReport);
+
+			// Print a simplified version to the console
+			historyReport.games = new Array();
+			console.log('  >> historyReport(JSON)', historyReport);
 		}
 	}
 
@@ -568,7 +651,7 @@ class Connect {
 			date: Date = new Date(),
 			filename: string,
 			elementDownload: HTMLElement = t.elementDownload,
-			workerData: string[] | {}[] = t.workerData; // string[csv] | {}[json];
+			workerData: string = t.workerData;
 
 		if (workerData.length) {
 			filename =
@@ -587,19 +670,17 @@ class Connect {
 				'_r' +
 				t.workerDataAmount;
 
-			if (t.workerDataCSV) {
-				dataString = 'data:text/csv;charset=utf-8,' + workerData.join('');
+			if (t.workerDataFormatCSV) {
 				filename += '.csv';
 			} else {
-				dataString = 'data:text/json;charset=utf-8,' + JSON.stringify(workerData);
 				filename += '.json';
 			}
 
-			// Free RAM
-			t.workerData = new Array();
-
-			elementDownload.setAttribute('href', dataString);
+			elementDownload.setAttribute('href', t.workerData);
 			elementDownload.setAttribute('download', filename);
+
+			// Free RAM
+			t.workerData = '';
 		}
 
 		elementDownload.click();
@@ -641,8 +722,8 @@ class Connect {
 			workersElements: {
 				progress: HTMLElement;
 				progressText: HTMLElement;
-				timeEstCompleteInS: HTMLElement;
-				timeTakenAvgInMS: HTMLElement;
+				timingLeft: HTMLElement;
+				timingRight: HTMLElement;
 			}[] = t.workersElements;
 
 		for (let i = 0; i < threads; i++) {
@@ -734,22 +815,23 @@ class Connect {
 			workersElements[i] = {
 				progress: elementContainerProgressBarContainerProgress,
 				progressText: elementContainerProgressText,
-				timeEstCompleteInS: elementContainerTimingRight,
-				timeTakenAvgInMS: elementContainerTimingLeft,
+				timingLeft: elementContainerTimingLeft,
+				timingRight: elementContainerTimingRight,
 			};
 		}
 	}
 
-	private dbProgressDisplayProgressUpdate(): void {
+	private dbProgressDisplayProgressUpdate(done?: boolean): void {
 		let t = this,
 			avgMSPerGame: number,
-			complete: number,
+			scratch: number,
+			timestampInMs: number = new Date().getTime(),
 			workersElement: any,
 			workersElements: {
 				progress: HTMLElement;
 				progressText: HTMLElement;
-				timeEstCompleteInS: HTMLElement;
-				timeTakenAvgInMS: HTMLElement;
+				timingLeft: HTMLElement;
+				timingRight: HTMLElement;
 			}[] = t.workersElements,
 			workersStat: any,
 			workersStats: {
@@ -759,31 +841,73 @@ class Connect {
 				timeTakenTotalInMS: number;
 			}[] = t.workersStats;
 
-		for (let i = 0; i < workersElements.length; i++) {
-			workersElement = workersElements[i];
-			workersStat = workersStats[i];
+		// Only update the visuals every Xms
+		if (done || timestampInMs - t.workerProgressUpdateTimestampInMs > 100) {
+			t.workerProgressUpdateTimestampInMs = timestampInMs;
 
-			workersElement.progress.style.width = Math.round(workersStat.amount / workersStat.amountRequested) * 100 + '%'; // integers are faster to draw
-			workersElement.progressText.innerText = workersStat.amount + '/' + workersStat.amountRequested;
+			for (let i = 0; i < workersElements.length; i++) {
+				workersElement = workersElements[i];
+				workersStat = workersStats[i];
 
-			avgMSPerGame = workersStat.timeTakenTotalInMS / workersStat.amount;
-			workersElement.timeTakenAvgInMS.innerText = Math.round(avgMSPerGame) + 'ms-avg/game';
+				// integers are faster to draw
+				workersElement.progress.style.width = Math.round((workersStat.amount / workersStat.amountRequested) * 100) + '%';
+				workersElement.progressText.innerText = workersStat.amount + '/' + workersStat.amountRequested;
 
-			if (workersStat.amount >= workersStat.amountRequested) {
-				workersElement.progress.className = 'progress complete';
-				workersElement.timeEstCompleteInS.innerText = 'Complete';
-			} else {
-				workersElement.timeEstCompleteInS.innerText =
-					'Est ' + Math.round(((workersStat.amountRequested / workersStat.amount) * avgMSPerGame) / 1000) + 's remaining';
+				// timing left
+				avgMSPerGame = workersStat.timeTakenTotalInMS / workersStat.amount;
+				workersElement.timingLeft.innerText = avgMSPerGame.toFixed(2) + 'ms-avg/game';
+
+				// timing left
+				if (workersStat.amount >= workersStat.amountRequested) {
+					workersElement.progress.className = 'progress complete';
+
+					scratch = workersStat.timeTakenTotalInMS / 1000;
+					if (scratch > 60) {
+						workersElement.timingRight.innerText = 'Completed in ' + (scratch / 60).toFixed(1) + 'min';
+					} else {
+						workersElement.timingRight.innerText = 'Completed in ' + scratch.toFixed(1) + 's';
+					}
+				} else {
+					scratch = ((workersStat.amountRequested - workersStat.amount) * avgMSPerGame) / 1000;
+					if (scratch > 60) {
+						workersElement.timingRight.innerText = (scratch / 60).toFixed(1) + 'min remaining';
+					} else {
+						workersElement.timingRight.innerText = scratch.toFixed(1) + 's remaining';
+					}
+				}
 			}
 		}
 	}
 
-	private gameOver(historyByPositionHash: number[], oWon: boolean, winningPostionHashes: number[]): void {
+	private descisionClick(yes: boolean): void {
+		let t = this;
+
+		t.descisionPromiseResolve(yes);
+		t.elementSettings.style.opacity = '0';
+		setTimeout(() => {
+			// Allow fade out
+			t.elementDecision.style.display = 'none';
+		}, 125);
+	}
+
+	private descisionDisplay(message: string): Promise<boolean> {
+		let t = this,
+			promise: Promise<boolean> = new Promise((resolve, reject) => {
+				t.descisionPromiseResolve = resolve;
+			});
+
+		t.elementDecisionMessage.innerText = message;
+		t.elementDecision.style.display = 'block';
+		t.elementDecision.style.opacity = '1';
+
+		return promise;
+	}
+
+	private gameOver(historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | null): void {
 		let t = this,
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash;
 
-		if (t.showEvaluations) {
+		if (t.showEvaluations && winningPostionHashes) {
 			// Update evaluation
 			for (let i in elementBoardGridCellsColorByPositionHash) {
 				elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';

@@ -52,6 +52,8 @@ export class EvaluationLinearEngine {
 		// Eval
 		EvaluationLinearEngine._calc(dimensions, masterSet, workingData, algorithmType);
 
+		// NO MORE VIABLE POSITIONS
+
 		// Map positionsHashes by value
 		for (let [positionHash, values] of Object.entries(valuesByPositionHash)) {
 			valueSum = values.o + values.x;
@@ -184,6 +186,20 @@ export class EvaluationLinearEngine {
 				placementCellsLength = placement.cells.length;
 				indexSearchAfter = j;
 				indexSearchBefore = j;
+
+				/*
+				 * Algorithm: 0 "EverybodyGetsAPoint"
+				 *
+				 * You get a point, you get a point, every neighbor gets a point
+				 */
+				if (algorithmType === undefined || algorithmType === AlgorithmType.TYPE0_EVERYBODY) {
+					if (chain.placement.gapAfter > 0) {
+						adder(set[placement.index + placementCellsLength], 1);
+					}
+					if (chain.placement.gapBefore > 0) {
+						adder(set[placement.index - 1], 1);
+					}
+				}
 
 				/*
 				 * Algorithm: 1 "Viability"
