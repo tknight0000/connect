@@ -88,13 +88,13 @@
 									<tr>
 										<td>Board Height</td>
 										<td>
-											<input min=3 max=20 name="boardB" type="number" value=10 />
+											<input min=3 max=20 name="boardB" type="number" value=9 />
 										</td>
 									</tr>
 									<tr>
 										<td>Board Width</td>
 										<td>
-											<input min=3 max=20 name="boardA" type="number" value=10 />
+											<input min=3 max=20 name="boardA" type="number" value=9 />
 										</td>
 									</tr>
 									<tr>
@@ -277,19 +277,32 @@
 									<tr>
 										<td>Board Height</td>
 										<td>
-											<input min=3 max=20 id="settings-gameboard-B" name="boardB" type="number" value=10 />
+											<input min=3 max=20 id="settings-gameboard-B" name="boardB" type="number" value=9 />
 										</td>
 									</tr>
 									<tr>
 										<td>Board Width</td>
 										<td>
-											<input min=3 max=20 id="settings-gameboard-A" name="boardA" type="number" value=10 />
+											<input min=3 max=20 id="settings-gameboard-A" name="boardA" type="number" value=9 />
 										</td>
 									</tr>
 									<tr>
 										<td>Connect Size</td>
 										<td>
 											<input min=3 max=10 name="connectSize" type="number" value=5 />
+										</td>
+									</tr>
+									<tr>
+										<td>Play As</td>
+										<td class="radio-spread">
+											<span>
+												X
+												<input name="dbFormPlayAs" type="radio" checked />
+											</span>
+											<span>
+												O
+												<input name="dbFormPlayAs" type="radio" />
+											</span>
 										</td>
 									</tr>
 									<tr>
@@ -307,13 +320,13 @@
 										</td>
 									</tr>
 									<tr>
-										<td>Skill O</td>
+										<td>Skill</td>
 										<td>
 											<input min=1 max=5 name="skill" type="range" value=5 />
 										</td>
 									</tr>
 									<tr>
-										<td>Skill O Engine</td>
+										<td>Skill Engine</td>
 										<td class="radio-spread">
 											<span>
 												AI/ML

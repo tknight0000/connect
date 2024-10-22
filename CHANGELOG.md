@@ -1,3 +1,7 @@
+# AlgorithmsUpdate
+
+-	Added ability to play as O
+
 # 1.2.0
 
 Additions

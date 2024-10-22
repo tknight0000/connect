@@ -22,13 +22,21 @@
 
 # Cool Stats
 
-The following statistics were derived from 1,000,000 computer vs computer games, at expert difficulty, on a 10 by 10 gameboard. 
+To provide the statistics above, it took ~18 minutes for 8 threads to individually generate 125,000 games each at ~8.3 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own datesets for statistical analysis and AI/ML training!
+
+### 1000000 games, at expert, on a 10x10 board 
 
 -	Games Drawn: `89.32%`
 -	O Wins: `2.02%`
 -	X Wins: `97.98%`
+-	Compilation: 8 threads at ~8.3 ms/game with total time of ~18 minutes
 
-To provide the statistics above, it took ~18 minutes for 8 threads to individually generate 125,000 games each at ~8.3 ms/game. See the `How To Generate AI/ML Datasets For Training` section to learn how to generate your own datesets for statistical analysis and AI/ML training!
+### 1000000 games, at expert, on a 9x9 board 
+
+-	Games Drawn: `21.25%`
+-	O Wins: `36.76%`
+-	X Wins: `63.24%`
+-	Compilation: 8 threads at ~1.7 ms/game with total time of ~7 minutes
 
 # How To Generate AI/ML Datasets For Training
 
@@ -48,13 +56,14 @@ To provide the statistics above, it took ~18 minutes for 8 threads to individual
 
 ## Clipboard Copies
 
--	Example: `0303035O;512,257,513,514,258,0`
-	-	Part1: `0303035O`
-		-	`**03035O` represents the gameboard size in the `A` direction
-		-	`03**035O` represents the gameboard size in the `B` direction
-		-	`0303**5O` represents the connect size
-		-	`030303*O` represents the `O` opponent's skill where `0` is an AI/ML engine and `1-5` is noob-to-expert
-		-	`0303035*` represents the winner as `X`, `O`, or `D` for draw
+-	Example: `X0303035O;512,257,513,514,258,0`
+	-	Part1: `X0303035O`
+		-	`*0303035O` represents the player played as `X` or `O`
+		-	`X**03035O` represents the gameboard size in the `A` direction
+		-	`X03**035O` represents the gameboard size in the `B` direction
+		-	`X0303**5O` represents the connect size
+		-	`X030303*O` represents the `O` opponent's skill where `0` is an AI/ML engine and `1-5` is noob-to-expert
+		-	`X0303035*` represents the winner as `X`, `O`, or `D` for draw
 	-	Part2: `512,257,513,514,258,0`
 		-	This is an array of postionHashes (see `DB Parsing` for how to parse). The first value is always `X`.
 	-	Description: This was a human vs computer game on a 3x3 gameboard with a connect size of 3 (tic-tac-toe). The computer was playing on expert difficulty, and won after a total of 6 moves.

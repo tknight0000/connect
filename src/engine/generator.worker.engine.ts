@@ -63,6 +63,7 @@ self.onmessage = (event: MessageEvent) => {
 			aMax,
 			bMax,
 			connectSize,
+			true,
 			skillOShuffle ? GameEngine.getSkillRandom() : skillO,
 			skillOEngineAIML,
 			skillXShuffle ? GameEngine.getSkillRandom() : skillX,

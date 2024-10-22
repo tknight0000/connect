@@ -27,6 +27,7 @@ export class GameEngine {
 	private historyModePlayTimeout: ReturnType<typeof setTimeout>;
 	private human: boolean = false; // human implies X piece
 	private initialized: boolean = false;
+	private playAsX: boolean = true;
 	private skillO: number = 5;
 	private skillOEngineAIML: boolean = false;
 	private skillX: number = 5;
@@ -96,11 +97,13 @@ export class GameEngine {
 		gameboardSizeA: number;
 		gameboardSizeB: number;
 		oWin: boolean | null;
+		playAsX: boolean;
 	} | null {
 		let t = this,
 			data: {
 				games: number[];
 				oWin: boolean | null;
+				playAsX: boolean;
 				settingsGameboardSizeA: number;
 				settingsGameboardSizeB: number;
 				settingsConnectSize: number;
@@ -128,6 +131,7 @@ export class GameEngine {
 			data.settingsGameboardSizeA - 1,
 			data.settingsGameboardSizeB - 1,
 			data.settingsConnectSize,
+			data.playAsX,
 			SkillEngine.getSkillMax(),
 			false,
 			SkillEngine.getSkillMax(),
@@ -139,6 +143,7 @@ export class GameEngine {
 			gameboardSizeA: data.settingsGameboardSizeA,
 			gameboardSizeB: data.settingsGameboardSizeB,
 			oWin: data.oWin,
+			playAsX: data.playAsX,
 		};
 	}
 
@@ -258,6 +263,7 @@ export class GameEngine {
 	public historyParse(history: string): {
 		games: number[];
 		oWin: boolean | null;
+		playAsX: boolean;
 		settingsGameboardSizeA: number;
 		settingsGameboardSizeB: number;
 		settingsConnectSize: number;
@@ -268,6 +274,7 @@ export class GameEngine {
 			histories: string[] = history.trim().split(';'),
 			oWin: boolean | null,
 			oWinString: string,
+			playAsX: boolean,
 			positionHash: number,
 			settings: string,
 			settingsGameboardSizeA: number,
@@ -284,15 +291,24 @@ export class GameEngine {
 
 		// Settings
 		settings = histories[0];
-		if (settings.length !== 8) {
+		if (settings.length !== 9) {
 			// console.error("GameEngine > historyParse: settings failed");
 			return null;
 		}
 
-		oWinString = settings.substring(7, 8);
-		settingsGameboardSizeA = Number(settings.substring(0, 2));
-		settingsGameboardSizeB = Number(settings.substring(2, 4));
-		settingsConnectSize = Number(settings.substring(4, 6));
+		if (settings[0] === 'X') {
+			playAsX = true;
+		} else if (settings[0] === 'O') {
+			playAsX = false;
+		} else {
+			// console.error("GameEngine > historyParse: invalid play as value");
+			return null;
+		}
+
+		oWinString = settings.substring(8, 9);
+		settingsGameboardSizeA = Number(settings.substring(1, 3));
+		settingsGameboardSizeB = Number(settings.substring(3, 5));
+		settingsConnectSize = Number(settings.substring(5, 7));
 
 		if (oWinString !== 'O' && oWinString !== 'X' && oWinString !== 'D') {
 			// console.error("GameEngine > historyParse: invalid result");
@@ -348,6 +364,7 @@ export class GameEngine {
 		return {
 			games: games,
 			oWin: oWin,
+			playAsX: playAsX,
 			settingsGameboardSizeA: settingsGameboardSizeA,
 			settingsGameboardSizeB: settingsGameboardSizeB,
 			settingsConnectSize: settingsConnectSize,
@@ -358,6 +375,7 @@ export class GameEngine {
 		aMax: number,
 		bMax: number,
 		connectSize: number,
+		playAsX: boolean,
 		skillO: number,
 		skillOEngineAIML: boolean,
 		skillX: number = -1,
@@ -372,6 +390,7 @@ export class GameEngine {
 
 		t.dimensions = dimensions;
 		t.human = skillX === -1;
+		t.playAsX = playAsX;
 		t.skillO = skillO;
 		t.skillOEngineAIML = skillOEngineAIML;
 		t.skillX = skillX;
@@ -444,6 +463,20 @@ export class GameEngine {
 
 		if (!t.human && !historical) {
 			t.placeAuto();
+		} else if (t.human && !t.playAsX) {
+			// computer place first
+			positionHash = SkillEngine.placeFirst(t.dimensions, t.skillX, t.workingData);
+			delete t.workingData.placementsAvailableByPositionHash[positionHash];
+			t.workingData.placementsByPositionHash[positionHash] = !t.playAsX; // true is O
+			t.historyByPositionHash.push(positionHash);
+
+			// Let system know human placement is expected
+			if (t.callbackPlace) {
+				// The computer played this position
+				t.callbackPlace(positionHash);
+			} else {
+				console.error('GameEngine > rest: no placement callback set');
+			}
 		}
 	}
 
@@ -470,7 +503,7 @@ export class GameEngine {
 		// Update board (working data) - Human Placement
 		t.historyByPositionHash.push(positionHash);
 		delete t.workingData.placementsAvailableByPositionHash[positionHash];
-		t.workingData.placementsByPositionHash[positionHash] = false; // false is X (human)
+		t.workingData.placementsByPositionHash[positionHash] = !t.playAsX; // false is X (human)
 		if (!t.calc(false)) {
 			// GameOver
 			return true;
@@ -485,7 +518,7 @@ export class GameEngine {
 		}
 		t.historyByPositionHash.push(positionHash);
 		delete t.workingData.placementsAvailableByPositionHash[positionHash];
-		t.workingData.placementsByPositionHash[positionHash] = true; // true is O (computer)
+		t.workingData.placementsByPositionHash[positionHash] = t.playAsX; // true is O (computer)
 		if (!t.calc(true)) {
 			// GameOver
 			return true;

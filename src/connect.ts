@@ -67,14 +67,17 @@ class Connect {
 	private elementSettings: HTMLElement;
 	private elementSpinner: HTMLElement;
 	private elementVersion: HTMLElement;
-	private gameboardSizeA: number = 10;
-	private gameboardSizeB: number = 10;
+	private gameboardSizeA: number = 9;
+	private gameboardSizeB: number = 9;
 	private gameConnectSize: number = 5;
 	private gameEngine: GameEngine = new GameEngine();
 	private historyGameboardSizeA: number;
 	private historyGameboardSizeB: number;
 	private historyOWin: boolean | null;
+	private historyPlayAsX: boolean;
 	private menuOpen: boolean;
+	private playAsX: boolean = true;
+	private playFirst: boolean = true;
 	private showEvaluations: boolean = true;
 	private skill: number = 5;
 	private skillEngineAIML: boolean;
@@ -198,6 +201,7 @@ class Connect {
 			let copyContent: string = '',
 				history: number[] = t.gameEngine.getHistory();
 
+			copyContent += t.playAsX ? 'X' : 'O';
 			copyContent += String(t.gameboardSizeA).padStart(2, '0');
 			copyContent += String(t.gameboardSizeB).padStart(2, '0');
 			copyContent += String(t.gameConnectSize).padStart(2, '0');
@@ -257,12 +261,14 @@ class Connect {
 				gameboardSizeA: number;
 				gameboardSizeB: number;
 				oWin: boolean | null;
+				playAsX: boolean;
 			} | null = t.gameEngine.historical(t.elementHistoryInput.value);
 
 			if (data) {
 				t.historyGameboardSizeA = data.gameboardSizeA;
 				t.historyGameboardSizeB = data.gameboardSizeB;
 				t.historyOWin = data.oWin;
+				t.historyPlayAsX = data.playAsX;
 				t.boardGridBuildBoard(data.gameboardSizeA, data.gameboardSizeB);
 
 				t.gameOverDisplay(false, null);
@@ -371,16 +377,20 @@ class Connect {
 			return;
 		}
 
+		t.playFirst = true;
+
 		// Hook gameEngine
 		t.gameEngine.setCallbackGameOver(t.gameOver.bind(this));
 		t.gameEngine.setCallbackPlace(t.boardGridPlaced.bind(this));
 		t.gameEngine.setCallbackHistory(t.boardGridPlacedHistorically.bind(this));
 
-		// Initialize gameEngine (-1 from length 10 is array range 0-9 or aMax & bMax)
-		t.gameEngine.initialize(gameboardSizeA - 1, gameboardSizeB - 1, t.gameConnectSize, t.skill, t.skillEngineAIML);
-
 		// Build the UI
 		t.boardGridBuildBoard(gameboardSizeA, gameboardSizeB);
+
+		// Initialize gameEngine (-1 from length 10 is array range 0-9 or aMax & bMax)
+		t.gameEngine.initialize(gameboardSizeA - 1, gameboardSizeB - 1, t.gameConnectSize, t.playAsX, t.skill, t.skillEngineAIML);
+
+		// Update the UI
 		t.gameOverDisplay(false, null);
 		t.historyControlDisplay(false);
 		t.historyModalDisplay(false);
@@ -467,7 +477,11 @@ class Connect {
 
 			// Create/style/append piece element
 			elementTDPiece = document.createElement('div');
-			elementTDPiece.className = 'piece x';
+			if (t.playAsX) {
+				elementTDPiece.className = 'piece x';
+			} else {
+				elementTDPiece.className = 'piece o';
+			}
 			elementTD.appendChild(elementTDPiece);
 
 			// Update gameEngine with placement
@@ -484,22 +498,28 @@ class Connect {
 			elementTDPiece: HTMLElement,
 			values: WorkingDataValues | null;
 
-		console.log('!boardGridPlaced');
-
 		// Remove clickable
 		elementTD.className = '';
 		elementTD.onclick = null;
 
 		// Create/style/append piece element
 		elementTDPiece = document.createElement('div');
-		if (x) {
-			elementTDPiece.className = 'piece x';
+		if (x !== undefined) {
+			if (x) {
+				elementTDPiece.className = 'piece x';
+			} else {
+				elementTDPiece.className = 'piece o';
+			}
 		} else {
-			elementTDPiece.className = 'piece o';
+			if (!t.playAsX) {
+				elementTDPiece.className = 'piece x';
+			} else {
+				elementTDPiece.className = 'piece o';
+			}
 		}
 		elementTD.appendChild(elementTDPiece);
 
-		if (t.showEvaluations) {
+		if (t.showEvaluations && (t.playAsX || !t.playFirst)) {
 			values = t.gameEngine.getValues();
 
 			if (values) {
@@ -532,7 +552,8 @@ class Connect {
 		}
 
 		// Done
-		if (!x) {
+		t.playFirst = false;
+		if (x === undefined) {
 			t.spinnerDisplay(false);
 		}
 	}
@@ -544,7 +565,8 @@ class Connect {
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } },
 			evaluationsEnabled: boolean = t.showEvaluations,
 			gameover: boolean = false,
-			historyOWin: boolean | null = t.historyOWin;
+			historyOWin: boolean | null = t.historyOWin,
+			historyPlayAsX: boolean = t.historyPlayAsX;
 
 		// Reset the board UI
 		t.boardGridBuildBoard(t.historyGameboardSizeA, t.historyGameboardSizeB);
@@ -556,11 +578,10 @@ class Connect {
 		// Add the pieces to the board
 		t.showEvaluations = false;
 		for (let i = 0; i < positionHashes.length; i++) {
-			// console.log(i + ' % 2', Boolean(i % 2));
 			if (!gameover && i !== 0 && i === positionHashes.length - 1) {
 				t.showEvaluations = evaluationsEnabled;
 			}
-			t.boardGridPlaced(positionHashes[i], !Boolean(i % 2));
+			t.boardGridPlaced(positionHashes[i], historyPlayAsX ? Boolean(i % 2) : !Boolean(i % 2));
 		}
 		t.showEvaluations = evaluationsEnabled;
 
@@ -795,7 +816,6 @@ class Connect {
 			return;
 		} else if (!confirmed) {
 			if (!(await t.descisionDisplay('Are you sure?'))) {
-				console.log('Connect > dbApplyWebWorkersCancel: cancel aborted');
 				return;
 			}
 		}
@@ -1148,8 +1168,6 @@ class Connect {
 		let t = this,
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash;
 
-		console.log('::gameOver');
-
 		if (t.showEvaluations) {
 			// Hide all colors
 			for (let i in elementBoardGridCellsColorByPositionHash) {
@@ -1194,8 +1212,14 @@ class Connect {
 			t.elementGameOverCanvasContainer.style.opacity = '1';
 
 			setTimeout(() => {
-				if (oWon === false) {
-					t.confetti.trigger();
+				if (t.playAsX) {
+					if (oWon === false) {
+						t.confetti.trigger();
+					}
+				} else {
+					if (oWon === true) {
+						t.confetti.trigger();
+					}
 				}
 			}, 1000);
 		} else {
@@ -1271,15 +1295,17 @@ class Connect {
 			boardB: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[0],
 			connectSize: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[2],
 			connectSizeResolved: number = Math.max(Number(connectSize.value), 3),
-			showEvaluations: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[3],
-			skill: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[4],
-			skillEngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[5];
+			playAsX: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[3],
+			showEvaluations: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[5],
+			skill: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[6],
+			skillEngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[7];
 
 		t.spinnerDisplay(true);
 
 		setTimeout(() => {
 			t.gameboardSizeA = Math.max(3, Math.min(20, Number(boardA.value)));
 			t.gameboardSizeB = Math.max(3, Math.min(20, Number(boardB.value)));
+			t.playAsX = Boolean(playAsX.checked);
 			t.showEvaluations = Boolean(showEvaluations.checked);
 			t.skill = Number(skill.value);
 			t.skillEngineAIML = Boolean(skillEngineAIML.checked);
