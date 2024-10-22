@@ -581,7 +581,7 @@ class Connect {
 			if (!gameover && i !== 0 && i === positionHashes.length - 1) {
 				t.showEvaluations = evaluationsEnabled;
 			}
-			t.boardGridPlaced(positionHashes[i], historyPlayAsX ? Boolean(i % 2) : !Boolean(i % 2));
+			t.boardGridPlaced(positionHashes[i], !Boolean(i % 2));
 		}
 		t.showEvaluations = evaluationsEnabled;
 
