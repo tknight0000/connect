@@ -149,7 +149,7 @@ class Connect {
 			t.descisionClick(true);
 		};
 		t.elementMenuContentClick.onclick = () => {
-			t.elementMenuContent.className = "content open";
+			t.elementMenuContent.className = 'content open';
 
 			setTimeout(() => {
 				t.menuOpen = true;
@@ -203,9 +203,9 @@ class Connect {
 			}
 			return false;
 		};
-		window.addEventListener("click", () => {
-			if(t.menuOpen) {
-				t.elementMenuContent.className = "content";
+		window.addEventListener('click', () => {
+			if (t.menuOpen) {
+				t.elementMenuContent.className = 'content';
 				t.menuOpen = false;
 			}
 		});
@@ -927,18 +927,26 @@ class Connect {
 		let t = this,
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash;
 
-		if (t.showEvaluations && winningPostionHashes) {
+		if (t.showEvaluations) {
 			// Update evaluation
-			for (let i in elementBoardGridCellsColorByPositionHash) {
-				elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
-				elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
-			}
+			if (winningPostionHashes) {
+				for (let i in elementBoardGridCellsColorByPositionHash) {
+					elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
+					elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
+				}
 
-			for (let i = 0; i < winningPostionHashes.length; i++) {
-				if (oWon) {
-					elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].o.style.opacity = '50';
-				} else {
-					elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].x.style.opacity = '50';
+				for (let i = 0; i < winningPostionHashes.length; i++) {
+					if (oWon) {
+						elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].o.style.opacity = '50';
+					} else {
+						elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].x.style.opacity = '50';
+					}
+				}
+			} else {
+				// Draw
+				for (let i in elementBoardGridCellsColorByPositionHash) {
+					elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
+					elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
 				}
 			}
 		}
@@ -954,8 +962,10 @@ class Connect {
 		if (active) {
 			if (oWon) {
 				t.elementGameOver.className = 'gameover o';
-			} else {
+			} else if (oWon === false) {
 				t.elementGameOver.className = 'gameover x';
+			} else {
+				t.elementGameOver.className = 'gameover draw';
 			}
 
 			t.elementGameOver.style.display = 'block';
@@ -964,7 +974,7 @@ class Connect {
 			t.elementGameOverCanvasContainer.style.opacity = '1';
 
 			setTimeout(() => {
-				if (!oWon) {
+				if (oWon === false) {
 					t.confetti.trigger();
 				}
 			}, 1000);

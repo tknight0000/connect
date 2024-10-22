@@ -76,6 +76,10 @@ $connect-header-logo-width: 152px;
 			z-index: 4;
 		}
 
+		&.draw {
+			box-shadow: inset 0 0 10px 15px rgba(243, 218, 109, 0.25);
+		}
+
 		&.o {
 			box-shadow: inset 0 0 10px 15px rgba(176, 42, 67, 0.25);
 		}

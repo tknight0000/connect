@@ -1,3 +1,11 @@
+# 1.1.1
+
+Fixes
+-	Drawn games with a human player results in a human win screen
+-	Mobile: Game should always default to connect-5 regardless of screen size
+-	Mobile: Menu remains open after selection (touch vs mouse)
+-	Mobile: Modal width too narrow on small screens
+
 # 1.1.0
 
 -	Added links to developer website. Allows people to play the hosted game there.
