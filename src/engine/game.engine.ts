@@ -11,14 +11,15 @@ import { Dimensions, MasterTraversalSetAndChains, WorkingData, WorkingDataValues
 export class GameEngine {
 	private bypassSkill: boolean = false;
 	private callbackGameOver:
-		| ((historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | null) => void)
+		| ((historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | undefined) => void)
 		| undefined;
-	private callbackHistory: ((positionHashes: number[], totalHashes: number) => void) | undefined;
+	private callbackHistory: ((positionHashes: number[], positionHashesWinning: number[] | undefined, totalHashes: number) => void) | undefined;
 	private callbackPlace: ((positionHash: number) => void) | undefined;
 	private dimensions: Dimensions;
 	private gameOver: boolean = false;
 	private gameOverOWon: boolean | null;
 	private historyByPositionHash: number[] = [];
+	private historyByPositionHashWinning: number[] | undefined = [];
 	private historyDimensions: Dimensions;
 	private historyMode: boolean = false;
 	private historyModeIndex: number;
@@ -43,6 +44,7 @@ export class GameEngine {
 
 		if (historical) {
 			masterSet = TraversalEngine.masterSet(t.historyDimensions, t.workingData);
+			t.historyByPositionHashWinning = masterSet.winningPositionHashes;
 			EvaluationLinearEngine.calc(t.historyDimensions, masterSet, t.workingData);
 		} else {
 			masterSet = TraversalEngine.masterSet(t.dimensions, t.workingData);
@@ -52,7 +54,7 @@ export class GameEngine {
 
 				if (t.callbackGameOver) {
 					t.gameOverOWon = null;
-					t.callbackGameOver(t.historyByPositionHash, null, t.skillO, t.skillX, null);
+					t.callbackGameOver(t.historyByPositionHash, null, t.skillO, t.skillX, undefined);
 				} else {
 					console.error('GameEngine > place: no game over callback set');
 				}
@@ -204,7 +206,7 @@ export class GameEngine {
 		}
 
 		if (t.callbackHistory) {
-			t.callbackHistory(historySliceByPositionHash, t.historyByPositionHash.length);
+			t.callbackHistory(historySliceByPositionHash, t.historyByPositionHashWinning, t.historyByPositionHash.length);
 		}
 		t.historicalControlPlayTimeout();
 	}
@@ -551,7 +553,7 @@ export class GameEngine {
 			oWon: boolean | null,
 			skillO: number,
 			skillX: number,
-			winningPostionHashes: number[] | null,
+			winningPostionHashes: number[] | undefined,
 		) => void,
 	): void {
 		this.callbackGameOver = callbackGameOver;
@@ -560,7 +562,7 @@ export class GameEngine {
 	/**
 	 * @param callbackHistory - called when the playing the history of a previous game
 	 */
-	public setCallbackHistory(callbackHistory: (positionHashes: number[], totalHashes: number) => void): void {
+	public setCallbackHistory(callbackHistory: (positionHashes: number[], positionHashesWinning: number[] | undefined, totalHashes: number) => void): void {
 		this.callbackHistory = callbackHistory;
 	}
 

@@ -484,6 +484,8 @@ class Connect {
 			elementTDPiece: HTMLElement,
 			values: WorkingDataValues | null;
 
+		console.log('!boardGridPlaced');
+
 		// Remove clickable
 		elementTD.className = '';
 		elementTD.onclick = null;
@@ -519,10 +521,8 @@ class Connect {
 					elements.x.style.opacity = String(opacityX / 100);
 
 					if (evaluation.o === valuesOMax) {
-						elements.o.className = 'color o max';
 						elements.o.style.opacity = '.8';
 					} else if (evaluation.x === valuesXMax) {
-						elements.x.className = 'color x max';
 						elements.x.style.opacity = '.8';
 					}
 				}
@@ -537,14 +537,14 @@ class Connect {
 		}
 	}
 
-	private boardGridPlacedHistorically(positionHashes: number[], totalHashes: number): void {
+	private boardGridPlacedHistorically(positionHashes: number[], positionHashesWinning: number[] | undefined, totalHashes: number): void {
 		let t = this,
 			element: HTMLElement,
 			elementPiece: HTMLElement,
-			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash,
-			elementBoardGridCellsByPositionHash: { [key: number]: HTMLElement } = t.elementBoardGridCellsByPositionHash,
+			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } },
 			evaluationsEnabled: boolean = t.showEvaluations,
-			gameover: boolean = false;
+			gameover: boolean = false,
+			historyOWin: boolean | null = t.historyOWin;
 
 		// Reset the board UI
 		t.boardGridBuildBoard(t.historyGameboardSizeA, t.historyGameboardSizeB);
@@ -565,6 +565,27 @@ class Connect {
 		t.showEvaluations = evaluationsEnabled;
 
 		if (gameover) {
+			if (evaluationsEnabled) {
+				elementBoardGridCellsColorByPositionHash = t.elementBoardGridCellsColorByPositionHash;
+
+				// Hide all colors
+				for (let i in elementBoardGridCellsColorByPositionHash) {
+					elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
+					elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
+				}
+
+				// Reveal winning colors
+				if (positionHashesWinning) {
+					for (let i = 0; i < positionHashesWinning.length; i++) {
+						if (historyOWin) {
+							elementBoardGridCellsColorByPositionHash[positionHashesWinning[i]].o.style.opacity = '.8';
+						} else {
+							elementBoardGridCellsColorByPositionHash[positionHashesWinning[i]].x.style.opacity = '.8';
+						}
+					}
+				}
+			}
+
 			if (t.historyOWin) {
 				t.elementGameOver.className = 'gameover o';
 			} else if (t.historyOWin === false) {
@@ -585,8 +606,11 @@ class Connect {
 		let t = this,
 			amountRequested: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[0],
 			boardA: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[2],
+			boardAEff: number = Math.max(3, Math.min(20, Number(boardA.value))),
 			boardB: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[1],
+			boardBEff: number = Math.max(3, Math.min(20, Number(boardB.value))),
 			connectSize: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[3],
+			connectSizeEff: number = Math.max(3, Number(connectSize.value)),
 			format: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[4],
 			skillO: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[6],
 			skillOEngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[7],
@@ -596,11 +620,15 @@ class Connect {
 			skillXShuffle: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[13],
 			threads: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[14];
 
+		if (connectSizeEff > boardAEff || connectSizeEff > boardBEff) {
+			connectSizeEff = Math.min(boardAEff, boardBEff);
+		}
+
 		t.dbApplyWebWorkers(
 			Number(amountRequested.value),
-			Number(boardA.value),
-			Number(boardB.value),
-			Number(connectSize.value),
+			boardAEff,
+			boardBEff,
+			connectSizeEff,
 			Boolean(format.checked),
 			Number(skillO.value),
 			Boolean(skillOEngineAIML.checked),
@@ -1116,30 +1144,27 @@ class Connect {
 		return promise;
 	}
 
-	private gameOver(historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | null): void {
+	private gameOver(historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | undefined): void {
 		let t = this,
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash;
 
-		if (t.showEvaluations) {
-			// Update evaluation
-			if (winningPostionHashes) {
-				for (let i in elementBoardGridCellsColorByPositionHash) {
-					elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
-					elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
-				}
+		console.log('::gameOver');
 
+		if (t.showEvaluations) {
+			// Hide all colors
+			for (let i in elementBoardGridCellsColorByPositionHash) {
+				elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
+				elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
+			}
+
+			// Reveal winning colors
+			if (winningPostionHashes) {
 				for (let i = 0; i < winningPostionHashes.length; i++) {
 					if (oWon) {
-						elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].o.style.opacity = '50';
+						elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].o.style.opacity = '.8';
 					} else {
-						elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].x.style.opacity = '50';
+						elementBoardGridCellsColorByPositionHash[winningPostionHashes[i]].x.style.opacity = '.8';
 					}
-				}
-			} else {
-				// Draw
-				for (let i in elementBoardGridCellsColorByPositionHash) {
-					elementBoardGridCellsColorByPositionHash[i].o.style.opacity = '0';
-					elementBoardGridCellsColorByPositionHash[i].x.style.opacity = '0';
 				}
 			}
 		}
@@ -1245,7 +1270,7 @@ class Connect {
 			boardA: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[1],
 			boardB: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[0],
 			connectSize: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[2],
-			connectSizeResolved: number = Number(connectSize.value),
+			connectSizeResolved: number = Math.max(Number(connectSize.value), 3),
 			showEvaluations: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[3],
 			skill: HTMLInputElement = <HTMLInputElement>t.elementMenuSettingsForm.elements[4],
 			skillEngineAIML: HTMLInputElement = <HTMLInputElement>t.elementMenuDBForm.elements[5];
@@ -1253,13 +1278,13 @@ class Connect {
 		t.spinnerDisplay(true);
 
 		setTimeout(() => {
-			t.gameboardSizeA = Number(boardA.value);
-			t.gameboardSizeB = Number(boardB.value);
+			t.gameboardSizeA = Math.max(3, Math.min(20, Number(boardA.value)));
+			t.gameboardSizeB = Math.max(3, Math.min(20, Number(boardB.value)));
 			t.showEvaluations = Boolean(showEvaluations.checked);
 			t.skill = Number(skill.value);
 			t.skillEngineAIML = Boolean(skillEngineAIML.checked);
 
-			if (connectSizeResolved > t.gameboardSizeA && connectSizeResolved > t.gameboardSizeA) {
+			if (connectSizeResolved > t.gameboardSizeA || connectSizeResolved > t.gameboardSizeB) {
 				connectSizeResolved = Math.min(t.gameboardSizeA, t.gameboardSizeB);
 				alert('ConnectSize decreased to ' + connectSizeResolved + ' due to board size limitation');
 			}

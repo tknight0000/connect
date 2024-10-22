@@ -26,7 +26,7 @@ self.onmessage = (event: MessageEvent) => {
 
 	// Set dumby callbacks (never called)
 	gameEngine.setCallbackGameOver(
-		(historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | null) => {
+		(historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | undefined) => {
 			amount++;
 			if (formatCSV) {
 				if (skillOEngineAIML) {
