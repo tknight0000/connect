@@ -1,4 +1,4 @@
-# History
+# 1.2.0
 
 Additions
 -	Added game-to-clipboard modal to gameover screen

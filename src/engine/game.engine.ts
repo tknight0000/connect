@@ -13,7 +13,7 @@ export class GameEngine {
 	private callbackGameOver:
 		| ((historyByPositionHash: number[], oWon: boolean | null, skillO: number, skillX: number, winningPostionHashes: number[] | null) => void)
 		| undefined;
-	private callbackHistory: ((positionHashes: number[]) => void) | undefined;
+	private callbackHistory: ((positionHashes: number[], totalHashes: number) => void) | undefined;
 	private callbackPlace: ((positionHash: number) => void) | undefined;
 	private dimensions: Dimensions;
 	private gameOver: boolean = false;
@@ -135,7 +135,7 @@ export class GameEngine {
 
 		return {
 			gameboardSizeA: data.settingsGameboardSizeA,
-			gameboardSizeB: data.settingsGameboardSizeA,
+			gameboardSizeB: data.settingsGameboardSizeB,
 			oWin: data.oWin,
 		};
 	}
@@ -204,7 +204,7 @@ export class GameEngine {
 		}
 
 		if (t.callbackHistory) {
-			t.callbackHistory(historySliceByPositionHash);
+			t.callbackHistory(historySliceByPositionHash, t.historyByPositionHash.length);
 		}
 		t.historicalControlPlayTimeout();
 	}
@@ -403,7 +403,7 @@ export class GameEngine {
 
 		if (historical) {
 			aMaxEff = t.historyDimensions.aMax + 1;
-			bMaxEff = t.historyDimensions.aMax + 1;
+			bMaxEff = t.historyDimensions.bMax + 1;
 		}
 
 		// Initialize map values to 0
@@ -560,7 +560,7 @@ export class GameEngine {
 	/**
 	 * @param callbackHistory - called when the playing the history of a previous game
 	 */
-	public setCallbackHistory(callbackHistory: (positionHashes: number[]) => void): void {
+	public setCallbackHistory(callbackHistory: (positionHashes: number[], totalHashes: number) => void): void {
 		this.callbackHistory = callbackHistory;
 	}
 

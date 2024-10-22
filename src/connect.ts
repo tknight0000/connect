@@ -218,6 +218,8 @@ class Connect {
 
 			copyContent += ';' + history.join(',');
 
+			console.log("clipboarded '" + copyContent + "'");
+
 			copy(copyContent);
 			t.elementGameOverModalCopy.disabled = true;
 		};
@@ -535,7 +537,7 @@ class Connect {
 		}
 	}
 
-	private boardGridPlacedHistorically(positionHashes: number[]): void {
+	private boardGridPlacedHistorically(positionHashes: number[], totalHashes: number): void {
 		let t = this,
 			element: HTMLElement,
 			elementPiece: HTMLElement,
@@ -547,7 +549,7 @@ class Connect {
 		// Reset the board UI
 		t.boardGridBuildBoard(t.historyGameboardSizeA, t.historyGameboardSizeB);
 
-		if (positionHashes.length === t.historyGameboardSizeA * t.historyGameboardSizeB) {
+		if (positionHashes.length === totalHashes) {
 			gameover = true;
 		}
 
