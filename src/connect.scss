@@ -34,7 +34,8 @@ $connect-header-logo-width: 152px;
 
 	.board,
 	.board-overlay,
-	.gameover {
+	.gameover,
+	.history-control {
 		bottom: 10px;
 		top: $connect-header-height + 20px;
 	}
@@ -43,7 +44,8 @@ $connect-header-logo-width: 152px;
 	.board-overlay,
 	.gameover,
 	.gameover-overlay,
-	.header-menu {
+	.header-menu,
+	.history-control {
 		border-radius: 5px;
 		left: 10px;
 		position: absolute;
@@ -141,7 +143,14 @@ $connect-header-logo-width: 152px;
 			z-index: 1;
 
 			.menu {
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="white" d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>')
+					center no-repeat;
 				display: none;
+				height: 25px;
+				position: relative;
+				top: 1px;
+				width: 25px;
 			}
 
 			.menu-item {
@@ -155,6 +164,7 @@ $connect-header-logo-width: 152px;
 
 				.menu-item {
 					display: none;
+					overflow: hidden;
 				}
 
 				&.open {
@@ -205,6 +215,72 @@ $connect-header-logo-width: 152px;
 			}
 		}
 	}
+
+	.history-control {
+		display: none;
+		justify-content: center;
+		z-index: 5;
+
+		.control {
+			align-items: center;
+			background-color: rgba(0, 0, 0, 0.5);
+			border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
+			border-radius: 5px;
+			display: flex;
+			height: 40px;
+			justify-content: space-evenly;
+			margin-bottom: 10px;
+			margin-top: auto;
+			padding-left: 7.5px;
+			width: 200px;
+
+			.icon {
+				background-color: var(--global-color-gray-bb);
+			}
+
+			.end {
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M52.5 440.6c-9.5 7.9-22.8 9.7-34.1 4.4S0 428.4 0 416L0 96C0 83.6 7.2 72.3 18.4 67s24.5-3.6 34.1 4.4l192 160L256 241l0-145c0-17.7 14.3-32 32-32s32 14.3 32 32l0 320c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-145-11.5 9.6-192 160z"/></svg>');
+			}
+			.next {
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="white" d="M52.5 440.6c-9.5 7.9-22.8 9.7-34.1 4.4S0 428.4 0 416L0 96C0 83.6 7.2 72.3 18.4 67s24.5-3.6 34.1 4.4L224 214.3l0 41.7 0 41.7L52.5 440.6zM256 352l0-96 0-128 0-32c0-12.4 7.2-23.7 18.4-29s24.5-3.6 34.1 4.4l192 160c7.3 6.1 11.5 15.1 11.5 24.6s-4.2 18.5-11.5 24.6l-192 160c-9.5 7.9-22.8 9.7-34.1 4.4s-18.4-16.6-18.4-29l0-64z"/></svg>');
+			}
+			.pause {
+				display: none;
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M48 64C21.5 64 0 85.5 0 112L0 400c0 26.5 21.5 48 48 48l32 0c26.5 0 48-21.5 48-48l0-288c0-26.5-21.5-48-48-48L48 64zm192 0c-26.5 0-48 21.5-48 48l0 288c0 26.5 21.5 48 48 48l32 0c26.5 0 48-21.5 48-48l0-288c0-26.5-21.5-48-48-48l-32 0z"/></svg>');
+			}
+			.play {
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="white" d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80L0 432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>');
+			}
+			.previous {
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="white" d="M459.5 440.6c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29l0-320c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4L288 214.3l0 41.7 0 41.7L459.5 440.6zM256 352l0-96 0-128 0-32c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4l-192 160C4.2 237.5 0 246.5 0 256s4.2 18.5 11.5 24.6l192 160c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29l0-64z"/></svg>');
+				right: 5px;
+			}
+			.start {
+				// !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+				mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M267.5 440.6c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29l0-320c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4l-192 160L64 241 64 96c0-17.7-14.3-32-32-32S0 78.3 0 96L0 416c0 17.7 14.3 32 32 32s32-14.3 32-32l0-145 11.5 9.6 192 160z"/></svg>');
+				left: 2px;
+			}
+
+			.icon {
+				cursor: pointer;
+				height: 20px;
+				mask-repeat: no-repeat;
+				mask-size: contain;
+				position: relative;
+				transition: background-color 0.125s linear;
+				width: 20px;
+
+				&:hover {
+					background-color: var(--global-color-font-bright);
+				}
+			}
+		}
+	}
 }
 
 .modal-db {
@@ -220,7 +296,8 @@ $connect-header-logo-width: 152px;
 .modal-db,
 .modal-db-progress,
 .modal-decision,
-.modal-gameover,
+.modal-history,
+.modal-history,
 .modal-settings {
 	display: none;
 
@@ -426,6 +503,31 @@ $connect-header-logo-width: 152px;
 
 			.body {
 				height: 190px;
+			}
+		}
+	}
+}
+
+.modal-history {
+	z-index: 2;
+
+	.foreground {
+		.container {
+			height: 200px;
+			width: 350px;
+
+			.body {
+				height: 140px;
+				padding-bottom: 0;
+				padding-top: 0;
+
+				form {
+					align-items: center;
+					display: flex;
+					flex-direction: column;
+					height: 100%;
+					justify-content: space-evenly;
+				}
 			}
 		}
 	}

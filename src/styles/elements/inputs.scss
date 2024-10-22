@@ -41,6 +41,7 @@ textarea {
 		outline: none;
 	}
 
+	&.invalid,
 	&.ng-invalid {
 		border: 2px solid var(--global-color-red);
 	}

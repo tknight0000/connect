@@ -109,7 +109,7 @@ Output files from the build processes are stored in the `dist` directory
 ## Dev
 -	This is for active coding/development
 -	`npm run dev` to watch for code changes and live-reload browser if changed
--	`npm run test-dev` to watch for code changes and re-run unit tests [Jest](https://jestjs.io) if changed
+-	`npm run test-dev` to watch for code changes and re-run unit tests ([Jest](https://jestjs.io)) if changed
 	-	Leverage the `printGameboard(displayOPieces?: boolean, note?: string)` function to visualize the evaluations in the command line
 		-	```
 			*title-here*
@@ -129,5 +129,5 @@ Output files from the build processes are stored in the `dist` directory
 
 ## Prod
 -	This builds the final production grade version of the app
--	`npm run prod` to generate the optimized `connect.html` and `*.connect.js`
+-	`npm run prod` to generate the optimized apps
 	-	Use `npm run serve` to start a web environment to play the game with all the features

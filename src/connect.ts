@@ -18,15 +18,26 @@ class Connect {
 	private elementConnectSize: HTMLElement;
 	private elementDecision: HTMLElement;
 	private elementDecisionMessage: HTMLElement;
-	private elementDecisionNo: HTMLElement;
-	private elementDecisionYes: HTMLElement;
+	private elementDecisionNo: HTMLButtonElement;
+	private elementDecisionYes: HTMLButtonElement;
 	private elementDownload: HTMLElement;
 	private elementGameOver: HTMLElement;
 	private elementGameOverCanvas: HTMLCanvasElement;
 	private elementGameOverCanvasContainer: HTMLElement;
 	private elementGameOverModal: HTMLElement;
-	private elementGameOverModalCopy: HTMLElement;
-	private elementGameOverModalReset: HTMLElement;
+	private elementGameOverModalCopy: HTMLButtonElement;
+	private elementGameOverModalReset: HTMLButtonElement;
+	private elementHistory: HTMLElement;
+	private elementHistoryCancel: HTMLElement;
+	private elementHistoryControl: HTMLElement;
+	private elementHistoryControlEnd: HTMLElement;
+	private elementHistoryControlNext: HTMLElement;
+	private elementHistoryControlPause: HTMLElement;
+	private elementHistoryControlPlay: HTMLElement;
+	private elementHistoryControlPrevious: HTMLElement;
+	private elementHistoryControlStart: HTMLElement;
+	private elementHistoryInput: HTMLInputElement;
+	private elementHistoryPlay: HTMLButtonElement;
 	private elementMenuContent: HTMLElement;
 	private elementMenuContentClick: HTMLElement;
 	private elementMenuDB: HTMLElement;
@@ -37,8 +48,8 @@ class Connect {
 	private elementMenuSettingsFormGameboardA: HTMLInputElement;
 	private elementMenuSettingsFormGameboardB: HTMLInputElement;
 	private elementMenuDBFormCancel: HTMLElement;
+	private elementMenuHistoricalReset: HTMLElement;
 	private elementMenuInfo: HTMLElement;
-	private elementMenuReset: HTMLElement;
 	private elementMenuSettingsDisable: HTMLElement;
 	private elementMenuSettingsEnable: HTMLElement;
 	private elementMenuSettingsForm: HTMLFormElement;
@@ -51,8 +62,8 @@ class Connect {
 	private elementMenuDBFormThreads: HTMLInputElement;
 	private elementMenuDBProgress: HTMLElement;
 	private elementMenuDBProgressContainer: HTMLElement;
-	private elementMenuDBProgressCancel: HTMLInputElement;
-	private elementMenuDBProgressDownload: HTMLInputElement;
+	private elementMenuDBProgressCancel: HTMLButtonElement;
+	private elementMenuDBProgressDownload: HTMLButtonElement;
 	private elementSettings: HTMLElement;
 	private elementSpinner: HTMLElement;
 	private elementVersion: HTMLElement;
@@ -60,6 +71,9 @@ class Connect {
 	private gameboardSizeB: number = 10;
 	private gameConnectSize: number = 5;
 	private gameEngine: GameEngine = new GameEngine();
+	private historyGameboardSizeA: number;
+	private historyGameboardSizeB: number;
+	private historyOWin: boolean | null;
 	private menuOpen: boolean;
 	private showEvaluations: boolean = true;
 	private skill: number = 5;
@@ -98,15 +112,26 @@ class Connect {
 		t.elementConnectSize = <HTMLElement>document.getElementById('connect-size');
 		t.elementDecision = <HTMLElement>document.getElementById('decision');
 		t.elementDecisionMessage = <HTMLElement>document.getElementById('descision-message');
-		t.elementDecisionNo = <HTMLElement>document.getElementById('descision-no');
-		t.elementDecisionYes = <HTMLElement>document.getElementById('descision-yes');
+		t.elementDecisionNo = <HTMLButtonElement>document.getElementById('descision-no');
+		t.elementDecisionYes = <HTMLButtonElement>document.getElementById('descision-yes');
 		t.elementDownload = <HTMLElement>document.getElementById('download');
 		t.elementGameOver = <HTMLElement>document.getElementById('gameover');
 		t.elementGameOverCanvas = <HTMLCanvasElement>document.getElementById('gameover-canvas');
 		t.elementGameOverCanvasContainer = <HTMLElement>document.getElementById('gameover-canvas-container');
 		t.elementGameOverModal = <HTMLElement>document.getElementById('gameover-modal');
-		t.elementGameOverModalCopy = <HTMLElement>document.getElementById('gameover-modal-copy');
-		t.elementGameOverModalReset = <HTMLElement>document.getElementById('gameover-modal-reset');
+		t.elementGameOverModalCopy = <HTMLButtonElement>document.getElementById('gameover-modal-copy');
+		t.elementGameOverModalReset = <HTMLButtonElement>document.getElementById('gameover-modal-reset');
+		t.elementHistory = <HTMLElement>document.getElementById('history');
+		t.elementHistoryCancel = <HTMLElement>document.getElementById('history-cancel');
+		t.elementHistoryControl = <HTMLElement>document.getElementById('history-control');
+		t.elementHistoryControlEnd = <HTMLElement>document.getElementById('history-control-end');
+		t.elementHistoryControlNext = <HTMLElement>document.getElementById('history-control-next');
+		t.elementHistoryControlPause = <HTMLElement>document.getElementById('history-control-pause');
+		t.elementHistoryControlPlay = <HTMLElement>document.getElementById('history-control-play');
+		t.elementHistoryControlPrevious = <HTMLElement>document.getElementById('history-control-previous');
+		t.elementHistoryControlStart = <HTMLElement>document.getElementById('history-control-start');
+		t.elementHistoryInput = <HTMLInputElement>document.getElementById('history-input');
+		t.elementHistoryPlay = <HTMLButtonElement>document.getElementById('history-play');
 		t.elementMenuContent = <HTMLElement>document.getElementById('menu-content');
 		t.elementMenuContentClick = <HTMLElement>document.getElementById('menu-content-click');
 		t.elementMenuDB = <HTMLElement>document.getElementById('db');
@@ -122,10 +147,10 @@ class Connect {
 		t.elementMenuDBFormThreads = <HTMLInputElement>document.getElementById('dbFormthreads');
 		t.elementMenuDBProgress = <HTMLElement>document.getElementById('dbProgress');
 		t.elementMenuDBProgressContainer = <HTMLElement>document.getElementById('dbProgressContainer');
-		t.elementMenuDBProgressCancel = <HTMLInputElement>document.getElementById('db-progress-click-cancel');
-		t.elementMenuDBProgressDownload = <HTMLInputElement>document.getElementById('db-progress-click-download');
+		t.elementMenuDBProgressCancel = <HTMLButtonElement>document.getElementById('db-progress-click-cancel');
+		t.elementMenuDBProgressDownload = <HTMLButtonElement>document.getElementById('db-progress-click-download');
+		t.elementMenuHistoricalReset = <HTMLElement>document.getElementById('toggle-click');
 		t.elementMenuInfo = <HTMLElement>document.getElementById('info-click');
-		t.elementMenuReset = <HTMLElement>document.getElementById('reset-click');
 		t.elementMenuSettingsDisable = <HTMLElement>document.getElementById('settings-click-disable');
 		t.elementMenuSettingsEnable = <HTMLElement>document.getElementById('settings-click-enable');
 		t.elementMenuSettingsForm = <HTMLFormElement>document.getElementById('settingsForm');
@@ -146,6 +171,15 @@ class Connect {
 		t.confetti = new Confetti(t.elementGameOverCanvas);
 
 		// Register onchanges
+		t.elementHistoryInput.oninput = (event: any) => {
+			if (t.gameEngine.historyParse(t.elementHistoryInput.value) !== null) {
+				t.elementHistoryInput.className = '';
+				t.elementHistoryPlay.disabled = false;
+			} else {
+				t.elementHistoryInput.className = 'invalid';
+				t.elementHistoryPlay.disabled = true;
+			}
+		};
 		t.elementMenuDBFormSkillOShuffle.onchange = (event: any) => {
 			t.elementMenuDBFormSkillO.disabled = (<HTMLInputElement>event.target).checked;
 		};
@@ -174,12 +208,10 @@ class Connect {
 				copyContent += t.gameEngine.getSkillO();
 			}
 
-			if (t.gameEngine.isGameOver()) {
-				if (history.length % 2) {
-					copyContent += 'X';
-				} else {
-					copyContent += 'O';
-				}
+			if (t.gameEngine.getGameOverOWon() === true) {
+				copyContent += 'O';
+			} else if (t.gameEngine.getGameOverOWon() === false) {
+				copyContent += 'X';
 			} else {
 				copyContent += 'D';
 			}
@@ -187,10 +219,59 @@ class Connect {
 			copyContent += ';' + history.join(',');
 
 			copy(copyContent);
+			t.elementGameOverModalCopy.disabled = true;
 		};
 		t.elementGameOverModalReset.onclick = () => {
 			t.gameOverDisplay(false, null);
 			t.boardGridBuild();
+		};
+		t.elementHistoryCancel.onclick = () => {
+			t.historyModalDisplay(false);
+		};
+		t.elementHistoryControlEnd.onclick = () => {
+			t.gameEngine.historicalControlEnd();
+		};
+		t.elementHistoryControlNext.onclick = () => {
+			t.gameEngine.historicalControlNext();
+		};
+		t.elementHistoryControlPause.onclick = () => {
+			t.gameEngine.historicalControlPause();
+			t.elementHistoryControlPlay.style.display = 'block';
+			t.elementHistoryControlPause.style.display = 'none';
+		};
+		t.elementHistoryControlPlay.onclick = () => {
+			t.gameEngine.historicalControlPlay();
+			t.elementHistoryControlPlay.style.display = 'none';
+			t.elementHistoryControlPause.style.display = 'block';
+		};
+		t.elementHistoryControlPrevious.onclick = () => {
+			t.gameEngine.historicalControlPrevious();
+		};
+		t.elementHistoryControlStart.onclick = () => {
+			t.gameEngine.historicalControlStart();
+		};
+		t.elementHistoryPlay.onclick = () => {
+			let data: {
+				gameboardSizeA: number;
+				gameboardSizeB: number;
+				oWin: boolean | null;
+			} | null = t.gameEngine.historical(t.elementHistoryInput.value);
+
+			if (data) {
+				t.historyGameboardSizeA = data.gameboardSizeA;
+				t.historyGameboardSizeB = data.gameboardSizeB;
+				t.historyOWin = data.oWin;
+				t.boardGridBuildBoard(data.gameboardSizeA, data.gameboardSizeB);
+
+				t.gameOverDisplay(false, null);
+				t.historyControlDisplay(true);
+				t.historyModalDisplay(false);
+				t.resetDisplay(true);
+
+				t.gameEngine.historicalControlStart();
+			}
+
+			return false;
 		};
 		t.elementMenuContentClick.onclick = () => {
 			t.elementMenuContent.className = 'content open';
@@ -220,9 +301,13 @@ class Connect {
 		t.elementMenuInfo.onclick = () => {
 			(<any>window).open('https://tknight.dev/#/creations', '_blank').focus();
 		};
-		t.elementMenuReset.onclick = () => {
-			t.gameOverDisplay(false, null);
-			t.boardGridBuild();
+		t.elementMenuHistoricalReset.onclick = () => {
+			if (t.elementMenuHistoricalReset.innerText === 'Reset') {
+				t.gameOverDisplay(false, null);
+				t.boardGridBuild();
+			} else {
+				t.historyModalDisplay(true);
+			}
 		};
 		t.elementMenuSettingsDisable.onclick = () => {
 			t.settingsDisplay(false);
@@ -255,21 +340,16 @@ class Connect {
 		});
 
 		// Shrink game board if aspect ratio to far from square
-		// aspectRatio = window.innerHeight / window.innerWidth;
-		// if (aspectRatio > 1.6) {
-		// 	console.log('portrait mode activated');
-		// 	t.gameboardSizeA = 5;
-		// 	t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
-		// } else if (aspectRatio < 0.5) {
-		// 	console.log('landscape mode activated');
-		// 	t.gameboardSizeB = 5;
-		// 	t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
-		// }
-		t.gameboardSizeA = 3;
-		t.gameboardSizeB = 3;
-		t.gameConnectSize = 3;
-		t.elementMenuSettingsFormGameboardA.value = String(t.gameboardSizeA);
-		t.elementMenuSettingsFormGameboardB.value = String(t.gameboardSizeB);
+		aspectRatio = window.innerHeight / window.innerWidth;
+		if (aspectRatio > 1.6) {
+			console.log('portrait mode activated');
+			t.gameboardSizeA = 5;
+			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
+		} else if (aspectRatio < 0.5) {
+			console.log('landscape mode activated');
+			t.gameboardSizeB = 5;
+			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
+		}
 
 		// Display Version
 		t.elementVersion.innerText = 'v' + globalPackageJSONVersion;
@@ -280,14 +360,7 @@ class Connect {
 
 	private boardGridBuild(): void {
 		let t = this,
-			boardGridClick: any = t.boardGridClick,
 			elementBoardGrid: HTMLElement | null = t.elementBoardGrid,
-			elementTD: HTMLElement,
-			elementTDColorO: HTMLElement,
-			elementTDColorX: HTMLElement,
-			elementTDCoordinate: HTMLElement,
-			elementTDOnClickFunction: HTMLElement,
-			elementTR: HTMLElement,
 			gameboardSizeA: number = t.gameboardSizeA,
 			gameboardSizeB: number = t.gameboardSizeB;
 
@@ -299,15 +372,35 @@ class Connect {
 		// Hook gameEngine
 		t.gameEngine.setCallbackGameOver(t.gameOver.bind(this));
 		t.gameEngine.setCallbackPlace(t.boardGridPlaced.bind(this));
+		t.gameEngine.setCallbackHistory(t.boardGridPlacedHistorically.bind(this));
 
 		// Initialize gameEngine (-1 from length 10 is array range 0-9 or aMax & bMax)
 		t.gameEngine.initialize(gameboardSizeA - 1, gameboardSizeB - 1, t.gameConnectSize, t.skill, t.skillEngineAIML);
 
+		// Build the UI
+		t.boardGridBuildBoard(gameboardSizeA, gameboardSizeB);
+		t.gameOverDisplay(false, null);
+		t.historyControlDisplay(false);
+		t.historyModalDisplay(false);
+		t.resetDisplay(false);
+
+		// Done
+		t.spinnerDisplay(false);
+	}
+
+	private boardGridBuildBoard(gameboardSizeA: number, gameboardSizeB: number): void {
+		let t = this,
+			elementBoardGrid: HTMLElement | null = t.elementBoardGrid,
+			elementTD: HTMLElement,
+			elementTDColorO: HTMLElement,
+			elementTDColorX: HTMLElement,
+			elementTDCoordinate: HTMLElement,
+			elementTR: HTMLElement;
+
 		// Clean gameboard
 		t.elementBoardGridCellsByPositionHash = <any>new Object();
 		t.elementBoardGridCellsColorByPositionHash = <any>new Object();
-		t.gameOverDisplay(false, null);
-		t.resetDisplay(false);
+		t.elementGameOverModalCopy.disabled = false;
 		while (elementBoardGrid.lastChild) {
 			elementBoardGrid.removeChild(elementBoardGrid.lastChild);
 		}
@@ -356,9 +449,6 @@ class Connect {
 			// Append row
 			elementBoardGrid.appendChild(elementTR);
 		}
-
-		// Done
-		t.spinnerDisplay(false);
 	}
 
 	private boardGridClick(positionHash: number): void {
@@ -385,10 +475,7 @@ class Connect {
 		});
 	}
 
-	/**
-	 * @param positionHash the computer played this position
-	 */
-	private boardGridPlaced(positionHash: number): void {
+	private boardGridPlaced(positionHash: number, x?: boolean): void {
 		let t = this,
 			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash,
 			elementTD: HTMLElement = t.elementBoardGridCellsByPositionHash[positionHash],
@@ -401,7 +488,11 @@ class Connect {
 
 		// Create/style/append piece element
 		elementTDPiece = document.createElement('div');
-		elementTDPiece.className = 'piece o';
+		if (x) {
+			elementTDPiece.className = 'piece x';
+		} else {
+			elementTDPiece.className = 'piece o';
+		}
 		elementTD.appendChild(elementTDPiece);
 
 		if (t.showEvaluations) {
@@ -439,7 +530,53 @@ class Connect {
 		}
 
 		// Done
-		t.spinnerDisplay(false);
+		if (!x) {
+			t.spinnerDisplay(false);
+		}
+	}
+
+	private boardGridPlacedHistorically(positionHashes: number[]): void {
+		let t = this,
+			element: HTMLElement,
+			elementPiece: HTMLElement,
+			elementBoardGridCellsColorByPositionHash: { [key: number]: { o: HTMLElement; x: HTMLElement } } = t.elementBoardGridCellsColorByPositionHash,
+			elementBoardGridCellsByPositionHash: { [key: number]: HTMLElement } = t.elementBoardGridCellsByPositionHash,
+			evaluationsEnabled: boolean = t.showEvaluations,
+			gameover: boolean = false;
+
+		// Reset the board UI
+		t.boardGridBuildBoard(t.historyGameboardSizeA, t.historyGameboardSizeB);
+
+		if (positionHashes.length === t.historyGameboardSizeA * t.historyGameboardSizeB) {
+			gameover = true;
+		}
+
+		// Add the pieces to the board
+		t.showEvaluations = false;
+		for (let i = 0; i < positionHashes.length; i++) {
+			// console.log(i + ' % 2', Boolean(i % 2));
+			if (!gameover && i !== 0 && i === positionHashes.length - 1) {
+				t.showEvaluations = evaluationsEnabled;
+			}
+			t.boardGridPlaced(positionHashes[i], !Boolean(i % 2));
+		}
+		t.showEvaluations = evaluationsEnabled;
+
+		if (gameover) {
+			if (t.historyOWin) {
+				t.elementGameOver.className = 'gameover o';
+			} else if (t.historyOWin === false) {
+				t.elementGameOver.className = 'gameover x';
+			} else {
+				t.elementGameOver.className = 'gameover draw';
+			}
+
+			t.elementGameOver.style.display = 'block';
+			t.elementGameOver.style.opacity = '1';
+		} else {
+			t.elementGameOver.style.display = 'none';
+			t.elementGameOver.style.opacity = '0';
+		}
 	}
 
 	private dbApply(): void {
@@ -1060,13 +1197,44 @@ class Connect {
 		}
 	}
 
+	private historyControlDisplay(active: boolean): void {
+		let t = this;
+
+		if (active) {
+			t.elementHistoryControl.style.display = 'flex';
+			t.elementHistoryControl.style.opacity = '1';
+		} else {
+			t.elementHistoryControl.style.opacity = '0';
+			setTimeout(() => {
+				// Allow fade out
+				t.elementHistoryControl.style.display = 'none';
+			}, 125);
+		}
+	}
+
+	private historyModalDisplay(active: boolean): void {
+		let t = this;
+
+		if (active) {
+			t.elementHistory.style.display = 'block';
+			t.elementHistory.style.opacity = '1';
+		} else {
+			t.elementHistory.style.opacity = '0';
+			setTimeout(() => {
+				// Allow fade out
+				t.elementHistory.style.display = 'none';
+				t.elementHistoryInput.value = '';
+			}, 125);
+		}
+	}
+
 	private resetDisplay(active: boolean): void {
 		let t = this;
 
 		if (active) {
-			t.elementMenuReset.style.visibility = 'visible';
+			t.elementMenuHistoricalReset.innerText = 'Reset';
 		} else {
-			t.elementMenuReset.style.visibility = 'hidden';
+			t.elementMenuHistoricalReset.innerText = 'Historical';
 		}
 	}
 
