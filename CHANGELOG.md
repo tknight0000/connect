@@ -1,3 +1,9 @@
+# 1.1.2
+
+Fixes
+-	Inputs are remembering previous settings
+-	Aspect ratio based gameboard changes on boot ignoring landscape
+
 # 1.1.1
 
 Fixes

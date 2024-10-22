@@ -30,6 +30,8 @@ class Connect {
 	private elementMenuDBDisable: HTMLElement;
 	private elementMenuDBForm: HTMLFormElement;
 	private elementMenuDBFormApply: HTMLElement;
+	private elementMenuSettingsFormGameboardA: HTMLInputElement;
+	private elementMenuSettingsFormGameboardB: HTMLInputElement;
 	private elementMenuDBFormCancel: HTMLElement;
 	private elementMenuInfo: HTMLElement;
 	private elementMenuReset: HTMLElement;
@@ -83,7 +85,8 @@ class Connect {
 	private workerProgressUpdateTimestampInMs: number = new Date().getTime();
 
 	constructor() {
-		let t = this;
+		let t = this,
+			aspectRatio: number;
 
 		// Cache element references
 		t.elementBoard = <HTMLElement>document.getElementById('board');
@@ -120,6 +123,8 @@ class Connect {
 		t.elementMenuSettingsEnable = <HTMLElement>document.getElementById('settings-click-enable');
 		t.elementMenuSettingsForm = <HTMLFormElement>document.getElementById('settingsForm');
 		t.elementMenuSettingsFormApply = <HTMLElement>document.getElementById('settingsFormApply');
+		t.elementMenuSettingsFormGameboardA = <HTMLInputElement>document.getElementById('settings-gameboard-A');
+		t.elementMenuSettingsFormGameboardB = <HTMLInputElement>document.getElementById('settings-gameboard-B');
 		t.elementMenuSettingsFormCancel = <HTMLElement>document.getElementById('settingsFormCancel');
 		t.elementSettings = <HTMLElement>document.getElementById('settings');
 		t.elementSpinner = <HTMLElement>document.getElementById('spinner');
@@ -210,12 +215,19 @@ class Connect {
 			}
 		});
 
-		// Shrink game board is taller than wider
-		if (window.innerWidth < window.innerHeight) {
-			console.log('vertical mode activated');
+		// Shrink game board if aspect ratio to far from square
+		aspectRatio = window.innerHeight / window.innerWidth;
+		if (aspectRatio > 1.6) {
+			console.log('portrait mode activated');
 			t.gameboardSizeA = 5;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
+		}else if (aspectRatio < .5) {
+			console.log('landscape mode activated');
+			t.gameboardSizeB = 5;
+			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
 		}
+		t.elementMenuSettingsFormGameboardA.value = String(t.gameboardSizeA);
+		t.elementMenuSettingsFormGameboardB.value = String(t.gameboardSizeB);
 
 		// Display Version
 		t.elementVersion.innerText = 'v' + globalPackageJSONVersion;
