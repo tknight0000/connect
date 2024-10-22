@@ -1,3 +1,12 @@
+# History
+
+Additions
+-	Added game-to-clipboard modal to gameover screen
+-	Added historical game playback
+
+Fixes
+-	Removed inlining as part of a production build
+
 # 1.1.2
 
 Fixes
