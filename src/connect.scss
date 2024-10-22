@@ -126,7 +126,7 @@ $connect-header-logo-width: 152px;
 					display: none;
 				}
 
-				&:hover {
+				&.open {
 					background-color: var(--global-color-modal-background);
 					border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
 					border-top: none;
@@ -405,7 +405,7 @@ $connect-header-logo-width: 152px;
 
 	.foreground {
 		.container {
-			width: 50% !important;
+			width: 50%;
 
 			.body {
 				height: 60vh;

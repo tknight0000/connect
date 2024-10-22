@@ -23,6 +23,8 @@ class Connect {
 	private elementGameOver: HTMLElement;
 	private elementGameOverCanvas: HTMLCanvasElement;
 	private elementGameOverCanvasContainer: HTMLElement;
+	private elementMenuContent: HTMLElement;
+	private elementMenuContentClick: HTMLElement;
 	private elementMenuDB: HTMLElement;
 	private elementMenuDBEnable: HTMLElement;
 	private elementMenuDBDisable: HTMLElement;
@@ -52,6 +54,7 @@ class Connect {
 	private gameboardSizeB: number = 10;
 	private gameConnectSize: number = 5;
 	private gameEngine: GameEngine = new GameEngine();
+	private menuOpen: boolean;
 	private showEvaluations: boolean = true;
 	private skill: number = 5;
 	private skillEngineAIML: boolean;
@@ -94,6 +97,8 @@ class Connect {
 		t.elementGameOver = <HTMLElement>document.getElementById('gameover');
 		t.elementGameOverCanvas = <HTMLCanvasElement>document.getElementById('gameover-canvas');
 		t.elementGameOverCanvasContainer = <HTMLElement>document.getElementById('gameover-canvas-container');
+		t.elementMenuContent = <HTMLElement>document.getElementById('menu-content');
+		t.elementMenuContentClick = <HTMLElement>document.getElementById('menu-content-click');
 		t.elementMenuDB = <HTMLElement>document.getElementById('db');
 		t.elementMenuDBDisable = <HTMLElement>document.getElementById('db-click-disable');
 		t.elementMenuDBEnable = <HTMLElement>document.getElementById('db-click-enable');
@@ -143,6 +148,13 @@ class Connect {
 		t.elementDecisionYes.onclick = () => {
 			t.descisionClick(true);
 		};
+		t.elementMenuContentClick.onclick = () => {
+			t.elementMenuContent.className = "content open";
+
+			setTimeout(() => {
+				t.menuOpen = true;
+			});
+		};
 		t.elementMenuDBEnable.onclick = () => {
 			t.dbDisplay(true);
 		};
@@ -191,12 +203,17 @@ class Connect {
 			}
 			return false;
 		};
+		window.addEventListener("click", () => {
+			if(t.menuOpen) {
+				t.elementMenuContent.className = "content";
+				t.menuOpen = false;
+			}
+		});
 
 		// Shrink game board is taller than wider
 		if (window.innerWidth < window.innerHeight) {
 			console.log('vertical mode activated');
 			t.gameboardSizeA = 5;
-			t.gameConnectSize = 4;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
 		}
 

@@ -13,7 +13,7 @@
     "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/working/connect.html --output dist/working/connect.html",
     "inliner": "node inline.js",
     "lint": "prettier src/. --write",
-    "prod": "rimraf dist && npm run lint && npm run test && npm run sass && npm run tsc && npm run html && npm run html-minify && npm run webpack && npm run favicon && npm run worker && npm run inliner && rimraf dist/working",
+    "prod": "rimraf dist && npm run lint && npm run test && npm run sass && npm run tsc && npm run html && npm run html-minify && npm run webpack && npm run favicon && npm run worker && npm run inliner",
     "sass": "sass src/connect.scss:dist/working/connect.css --no-source-map --style compressed",
     "sass-dev": "sass src/connect.scss:dist/connect.css --quiet --watch",
     "serve": "live-server dist --entry-file=connect.html --port 8080",
