@@ -278,15 +278,39 @@ export class GameEngine {
 		this.callbackPlace = callbackPlace;
 	}
 
-	public static getSkillMax() {
+	public isGameOver(): boolean {
+		return this.gameOver;
+	}
+
+	public getHistory(): number[] {
+		return this.historyByPositionHash;
+	}
+
+	public static getSkillMax(): number {
 		return SkillEngine.getSkillMax();
 	}
 
-	public static getSkillMin() {
+	public static getSkillMin(): number {
 		return SkillEngine.getSkillMin();
 	}
 
-	public static getSkillRandom() {
+	public getSkillO(): number {
+		return this.skillO;
+	}
+
+	public isSkillOAIML(): boolean {
+		return this.skillOEngineAIML;
+	}
+
+	public getSkillX(): number {
+		return this.skillX;
+	}
+
+	public isSkillXAIML(): boolean {
+		return this.skillXEngineAIML;
+	}
+
+	public static getSkillRandom(): number {
 		return SkillEngine.getSkillRandom();
 	}
 }

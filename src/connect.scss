@@ -42,7 +42,8 @@ $connect-header-logo-width: 152px;
 	.board,
 	.board-overlay,
 	.gameover,
-	.header {
+	.gameover-overlay,
+	.header-menu {
 		border-radius: 5px;
 		left: 10px;
 		position: absolute;
@@ -89,7 +90,33 @@ $connect-header-logo-width: 152px;
 		}
 	}
 
-	.header {
+	.gameover-overlay {
+		display: none;
+		z-index: 4;
+
+		.background {
+			display: none;
+		}
+
+		.foreground {
+			.container {
+				width: 220px;
+				min-width: 220px;
+
+				.body {
+					align-items: center;
+					display: flex;
+					flex-direction: column;
+					height: 140px;
+					justify-content: space-evenly;
+					padding-bottom: 0;
+					padding-top: 0;
+				}
+			}
+		}
+	}
+
+	.header-menu {
 		border: 2px solid rgba(var(--global-color-menu-border-rgb), 0.5);
 		height: $connect-header-height;
 		top: 10px;
@@ -193,6 +220,7 @@ $connect-header-logo-width: 152px;
 .modal-db,
 .modal-db-progress,
 .modal-decision,
+.modal-gameover,
 .modal-settings {
 	display: none;
 
@@ -404,7 +432,6 @@ $connect-header-logo-width: 152px;
 }
 
 .modal-settings {
-	display: none;
 	z-index: 2;
 
 	.foreground {

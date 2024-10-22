@@ -17,7 +17,7 @@
 	<body>
 		<a id="download" style="display:none;"></a>
 		<div class="connect wrapper">
-			<div class="header">
+			<div class="header-menu">
 				<div class="wrapper">
 					<div class="logo">
 	        			<a class="image" href="https://tknight.dev"></a>
@@ -42,6 +42,20 @@
 			<div class="gameover" id="gameover"></div>
 			<div class="gameover animation" id="gameover-canvas-container">
 				<canvas id="gameover-canvas" id="gameover-canvas"></canvas>
+			</div>
+			<div class="gameover-overlay modal" id="gameover-modal">
+				<div class="background"></div>
+				<div class="foreground">
+					<div class="container" onclick="event.stopPropagation()">
+						<div class="header">
+							Gameover
+						</div>
+						<div class="body">
+							<button id="gameover-modal-reset">Reset</button>
+							<button id="gameover-modal-copy">Game To Clipboard</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="modal-db modal" id="db">

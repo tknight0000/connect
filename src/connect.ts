@@ -2,6 +2,7 @@
  * @author tknight-dev
  */
 
+import copy from 'copy-to-clipboard';
 import { Confetti } from './libs/confetti';
 import { GameEngine, HistoryReport, HistoryReportInstance, WorkingDataValues } from './engine/game.engine';
 var globalPackageJSONVersion = require('../../package.json').version;
@@ -23,6 +24,9 @@ class Connect {
 	private elementGameOver: HTMLElement;
 	private elementGameOverCanvas: HTMLCanvasElement;
 	private elementGameOverCanvasContainer: HTMLElement;
+	private elementGameOverModal: HTMLElement;
+	private elementGameOverModalCopy: HTMLElement;
+	private elementGameOverModalReset: HTMLElement;
 	private elementMenuContent: HTMLElement;
 	private elementMenuContentClick: HTMLElement;
 	private elementMenuDB: HTMLElement;
@@ -100,6 +104,9 @@ class Connect {
 		t.elementGameOver = <HTMLElement>document.getElementById('gameover');
 		t.elementGameOverCanvas = <HTMLCanvasElement>document.getElementById('gameover-canvas');
 		t.elementGameOverCanvasContainer = <HTMLElement>document.getElementById('gameover-canvas-container');
+		t.elementGameOverModal = <HTMLElement>document.getElementById('gameover-modal');
+		t.elementGameOverModalCopy = <HTMLElement>document.getElementById('gameover-modal-copy');
+		t.elementGameOverModalReset = <HTMLElement>document.getElementById('gameover-modal-reset');
 		t.elementMenuContent = <HTMLElement>document.getElementById('menu-content');
 		t.elementMenuContentClick = <HTMLElement>document.getElementById('menu-content-click');
 		t.elementMenuDB = <HTMLElement>document.getElementById('db');
@@ -152,6 +159,38 @@ class Connect {
 		};
 		t.elementDecisionYes.onclick = () => {
 			t.descisionClick(true);
+		};
+		t.elementGameOverModalCopy.onclick = () => {
+			let copyContent: string = '',
+				history: number[] = t.gameEngine.getHistory();
+
+			copyContent += String(t.gameboardSizeA).padStart(2, '0');
+			copyContent += String(t.gameboardSizeB).padStart(2, '0');
+			copyContent += String(t.gameConnectSize).padStart(2, '0');
+
+			if (t.gameEngine.isSkillOAIML()) {
+				copyContent += '0';
+			} else {
+				copyContent += t.gameEngine.getSkillO();
+			}
+
+			if (t.gameEngine.isGameOver()) {
+				if (history.length % 2) {
+					copyContent += 'X';
+				} else {
+					copyContent += 'O';
+				}
+			} else {
+				copyContent += 'D';
+			}
+
+			copyContent += ';' + history.join(',');
+
+			copy(copyContent);
+		};
+		t.elementGameOverModalReset.onclick = () => {
+			t.gameOverDisplay(false, null);
+			t.boardGridBuild();
 		};
 		t.elementMenuContentClick.onclick = () => {
 			t.elementMenuContent.className = 'content open';
@@ -216,16 +255,19 @@ class Connect {
 		});
 
 		// Shrink game board if aspect ratio to far from square
-		aspectRatio = window.innerHeight / window.innerWidth;
-		if (aspectRatio > 1.6) {
-			console.log('portrait mode activated');
-			t.gameboardSizeA = 5;
-			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
-		} else if (aspectRatio < 0.5) {
-			console.log('landscape mode activated');
-			t.gameboardSizeB = 5;
-			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
-		}
+		// aspectRatio = window.innerHeight / window.innerWidth;
+		// if (aspectRatio > 1.6) {
+		// 	console.log('portrait mode activated');
+		// 	t.gameboardSizeA = 5;
+		// 	t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
+		// } else if (aspectRatio < 0.5) {
+		// 	console.log('landscape mode activated');
+		// 	t.gameboardSizeB = 5;
+		// 	t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
+		// }
+		t.gameboardSizeA = 3;
+		t.gameboardSizeB = 3;
+		t.gameConnectSize = 3;
 		t.elementMenuSettingsFormGameboardA.value = String(t.gameboardSizeA);
 		t.elementMenuSettingsFormGameboardB.value = String(t.gameboardSizeB);
 
@@ -488,7 +530,7 @@ class Connect {
 			// Spawn the workers (threads)
 			timeStartInMS = new Date().getTime();
 			for (let i = 0; i < threadsLimit; i++) {
-				worker = new Worker(new URL('./worker', import.meta.url));
+				worker = new Worker(new URL('./engine/generator.worker.engine', import.meta.url));
 				workers[i] = worker; // Cache worker reference for cancelling early
 
 				if (i === threadsLimit - 1) {
@@ -971,6 +1013,8 @@ class Connect {
 	private gameOverDisplay(active: boolean, oWon: boolean | null): void {
 		let t = this;
 
+		t.gameOverModalDisplay(active);
+
 		if (active) {
 			if (oWon) {
 				t.elementGameOver.className = 'gameover o';
@@ -997,6 +1041,21 @@ class Connect {
 				// Allow fade out
 				t.elementGameOver.style.display = 'none';
 				t.elementGameOverCanvasContainer.style.display = 'none';
+			}, 125);
+		}
+	}
+
+	private gameOverModalDisplay(active: boolean): void {
+		let t = this;
+
+		if (active) {
+			t.elementGameOverModal.style.display = 'block';
+			t.elementGameOverModal.style.opacity = '1';
+		} else {
+			t.elementGameOverModal.style.opacity = '0';
+			setTimeout(() => {
+				// Allow fade out
+				t.elementGameOverModal.style.display = 'none';
 			}, 125);
 		}
 	}

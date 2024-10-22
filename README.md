@@ -44,7 +44,22 @@ To provide the statistics above, it took ~18 minutes for 8 threads to individual
 -	In the `Gameplay DB Generator` page, scroll down until you see `Threads`. Increase the number of threads to scale the multithreading capabilities of the generator.
 -	MultiThreading is accomplished via JavaScript's [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
 
-# DB Parsing
+# How To Parse
+
+## Clipboard Copies
+
+-	Example: `0303035O;512,257,513,514,258,0`
+	-	Part1: `0303035O`
+		-	`**03035O` represents the gameboard size in the `A` direction
+		-	`03**035O` represents the gameboard size in the `B` direction
+		-	`0303**5O` represents the connect size
+		-	`030303*O` represents the `O` opponent's skill where `0` is an AI/ML engine and `1-5` is noob-to-expert
+		-	`0303035*` represents the winner as `X`, `O`, or `D` for draw
+	-	Part2: `512,257,513,514,258,0`
+		-	This is an array of postionHashes (see `DB Parsing` for how to parse). The first value is always `X`.
+	-	Description: This was a human vs computer game on a 3x3 gameboard with a connect size of 3 (tic-tac-toe). The computer was playing on expert difficulty, and won after a total of 6 moves.
+
+## DB Parsing
 
 -	Common to all formats
 	-	`X` always goes first
