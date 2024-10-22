@@ -2,7 +2,7 @@
  * @author tknight-dev
  */
 
-import { GameEngine, HistoryReport, HistoryReportInstance } from './engine/game.engine';
+import { GameEngine, HistoryReport, HistoryReportInstance } from './game.engine';
 
 self.onmessage = (event: MessageEvent) => {
 	let aMax: number = event.data.aMax,

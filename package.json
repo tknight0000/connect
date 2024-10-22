@@ -6,15 +6,14 @@
   "version": "1.1.2",
   "scripts": {
     "dev": "rimraf dist && npm run tsc && npm run favicon-dev && concurrently --kill-others \"npm run html-dev\" \"npm run sass-dev\" \"npm run serve-dev\" \"npm run tsc-dev\" \"npm run webpack-dev\" -n HTML,SCSS,HTTP,TS,WEBP --pad-prefix",
-    "favicon": "copyfiles favicon.ico dist/working",
+    "favicon": "copyfiles favicon.ico dist",
     "favicon-dev": "copyfiles favicon.ico dist",
-    "html": "copyfiles -u 1 src/connect.html dist/working",
+    "html": "copyfiles -u 1 src/connect.html dist",
     "html-dev": "nodemon --quiet --watch src/connect.html -x \"copyfiles -u 1 src/connect.html dist\"",
-    "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/working/connect.html --output dist/working/connect.html",
-    "inliner": "node inline.js",
+    "html-minify": "html-minifier-terser --collapse-whitespace --remove-comments dist/connect.html --output dist/connect.html",
     "lint": "prettier src/. --write",
-    "prod": "rimraf dist && npm run lint && npm run test && npm run sass && npm run tsc && npm run html && npm run html-minify && npm run webpack && npm run favicon && npm run worker && npm run inliner",
-    "sass": "sass src/connect.scss:dist/working/connect.css --no-source-map --style compressed",
+    "prod": "rimraf dist && npm run lint && npm run test && npm run sass && npm run tsc && npm run html && npm run html-minify && npm run webpack && npm run favicon && rimraf dist/working",
+    "sass": "sass src/connect.scss:dist/connect.css --no-source-map --style compressed",
     "sass-dev": "sass src/connect.scss:dist/connect.css --quiet --watch",
     "serve": "live-server dist --entry-file=connect.html --port 8080",
     "serve-dev": "live-server dist --entry-file=connect.html --port 8080 --quiet --watch=.",
@@ -22,9 +21,8 @@
     "test-dev": "jest --config=jest.dev.config.js --runInBand --watchAll",
     "tsc": "tsc --project tsconfig.json",
     "tsc-dev": "tsc --preserveWatchOutput --project tsconfig.dev.json --watch",
-    "webpack": "webpack --config webpack.config.js --mode production --output-path ./dist/working",
-    "webpack-dev": "webpack --config webpack.config.js --devtool source-map --mode development --output-path ./dist --watch",
-    "worker": "copyfiles -u 2 dist/working/*.connect.js dist"
+    "webpack": "webpack --config webpack.config.js --mode production --output-path ./dist",
+    "webpack-dev": "webpack --config webpack.config.js --devtool source-map --mode development --output-path ./dist --watch"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",
@@ -42,8 +40,10 @@
     "terser": "^5.0.0",
     "ts-jest": "^29.0.0",
     "typescript": "^5.0.0",
-    "web-resource-inliner": "^7.0.0",
     "webpack": "^5.0.0",
     "webpack-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "copy-to-clipboard": "^3.3.3"
   }
 }
