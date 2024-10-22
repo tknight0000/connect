@@ -221,7 +221,7 @@ class Connect {
 			console.log('portrait mode activated');
 			t.gameboardSizeA = 5;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
-		}else if (aspectRatio < .5) {
+		} else if (aspectRatio < 0.5) {
 			console.log('landscape mode activated');
 			t.gameboardSizeB = 5;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
