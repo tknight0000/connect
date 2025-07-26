@@ -49,7 +49,6 @@ class Connect {
 	private elementMenuSettingsFormGameboardB: HTMLInputElement;
 	private elementMenuDBFormCancel: HTMLElement;
 	private elementMenuHistoricalReset: HTMLElement;
-	private elementMenuInfo: HTMLElement;
 	private elementMenuSettingsDisable: HTMLElement;
 	private elementMenuSettingsEnable: HTMLElement;
 	private elementMenuSettingsForm: HTMLFormElement;
@@ -153,7 +152,6 @@ class Connect {
 		t.elementMenuDBProgressCancel = <HTMLButtonElement>document.getElementById('db-progress-click-cancel');
 		t.elementMenuDBProgressDownload = <HTMLButtonElement>document.getElementById('db-progress-click-download');
 		t.elementMenuHistoricalReset = <HTMLElement>document.getElementById('toggle-click');
-		t.elementMenuInfo = <HTMLElement>document.getElementById('info-click');
 		t.elementMenuSettingsDisable = <HTMLElement>document.getElementById('settings-click-disable');
 		t.elementMenuSettingsEnable = <HTMLElement>document.getElementById('settings-click-enable');
 		t.elementMenuSettingsForm = <HTMLFormElement>document.getElementById('settingsForm');
@@ -305,9 +303,6 @@ class Connect {
 		t.elementMenuDBProgressDownload.onclick = () => {
 			t.dbDownload();
 			return false;
-		};
-		t.elementMenuInfo.onclick = () => {
-			(<any>window).open('https://tknight.dev/#/creations', '_blank').focus();
 		};
 		t.elementMenuHistoricalReset.onclick = () => {
 			if (t.elementMenuHistoricalReset.innerText === 'Reset') {
