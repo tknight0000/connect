@@ -38,6 +38,7 @@ class Connect {
 	private elementHistoryControlStart: HTMLElement;
 	private elementHistoryInput: HTMLInputElement;
 	private elementHistoryPlay: HTMLButtonElement;
+	private elementLogo: HTMLElement;
 	private elementMenuContent: HTMLElement;
 	private elementMenuContentClick: HTMLElement;
 	private elementMenuDB: HTMLElement;
@@ -134,6 +135,7 @@ class Connect {
 		t.elementHistoryControlStart = <HTMLElement>document.getElementById('history-control-start');
 		t.elementHistoryInput = <HTMLInputElement>document.getElementById('history-input');
 		t.elementHistoryPlay = <HTMLButtonElement>document.getElementById('history-play');
+		t.elementLogo = <HTMLElement>document.getElementById('logo');
 		t.elementMenuContent = <HTMLElement>document.getElementById('menu-content');
 		t.elementMenuContentClick = <HTMLElement>document.getElementById('menu-content-click');
 		t.elementMenuDB = <HTMLElement>document.getElementById('db');
@@ -280,6 +282,7 @@ class Connect {
 			return false;
 		};
 		t.elementMenuContentClick.onclick = () => {
+			t.elementLogo.className = 'logo open';
 			t.elementMenuContent.className = 'content open';
 
 			setTimeout(() => {
@@ -337,6 +340,7 @@ class Connect {
 		};
 		window.addEventListener('click', () => {
 			if (t.menuOpen) {
+				t.elementLogo.className = 'logo';
 				t.elementMenuContent.className = 'content';
 				t.menuOpen = false;
 			}
@@ -347,10 +351,12 @@ class Connect {
 		if (aspectRatio > 1.6) {
 			console.log('portrait mode activated');
 			t.gameboardSizeA = 5;
+			t.gameConnectSize = 4;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
 		} else if (aspectRatio < 0.5) {
 			console.log('landscape mode activated');
 			t.gameboardSizeB = 5;
+			t.gameConnectSize = 4;
 			t.elementConnectSize.innerText = 'Connect ' + t.gameConnectSize;
 		}
 
